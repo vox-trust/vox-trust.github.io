@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vox Trust Protocol</title>
+<meta name="description" content="An open protocol and Rust reference implementation that seals a human voice at the source so anyone can verify it. Pre-alpha, draft spec.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://vox-trust.github.io/">
+<link rel="alternate" hreflang="en" href="https://vox-trust.github.io/">
+<link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vox Trust: don't detect fake voices, prove real ones">
+<meta property="og:description" content="An open protocol that seals a human voice at the source so anyone can verify it. Pre-alpha.">
+<meta property="og:url" content="https://vox-trust.github.io/">
+<style>
+:root{
+  --bg:#fbfbf9;--fg:#15181c;--muted:#566070;--card:#ffffff;--border:#e1e4e8;
+  --accent:#1f4fd8;--accent-fg:#ffffff;--code:#f0f1f3;
+  --ok:#0f6b45;--ok-bg:#e4f3ec;--warn:#855400;--warn-bg:#fcf0d4;--bad:#a0222a;--bad-bg:#fae6e7;--neutral-bg:#eceef1;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1013;--fg:#e8eaed;--muted:#a3abb6;--card:#151921;--border:#272d38;
+  --accent:#86a9ff;--accent-fg:#0b1020;--code:#1b2029;
+  --ok:#62d6a3;--ok-bg:#112419;--warn:#f1c35c;--warn-bg:#2a2410;--bad:#ff8c91;--bad-bg:#2c1416;--neutral-bg:#1c212a;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--accent)}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:46rem;margin:0 auto;padding:0 16px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 0;font-size:.95rem;flex-wrap:wrap}
+header.top .brand{font-weight:700;letter-spacing:.01em;color:var(--fg);text-decoration:none}
+header.top nav{display:flex;gap:16px;flex-wrap:wrap}
+.hero{padding:40px 0 24px}
+.chip{display:inline-block;font-size:.82rem;padding:4px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);background:var(--card)}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.08;margin:18px 0 8px;letter-spacing:-.02em}
+.tag{font-size:clamp(1.25rem,4vw,1.6rem);line-height:1.3;margin:0 0 16px;font-weight:600}
+.lead{color:var(--muted);margin:0 0 24px;max-width:38rem}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 18px;border-radius:8px;text-decoration:none;font-weight:600;border:1px solid var(--border);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+section{padding:28px 0;border-top:1px solid var(--border)}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px;letter-spacing:-.01em}
+p{margin:0 0 14px}
+ol,ul{margin:0 0 14px;padding-left:1.3rem}
+li{margin-bottom:8px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:16px 0}
+.card{border-radius:10px;padding:16px;border:1px solid var(--border);background:var(--card)}
+.card h3{margin:8px 0 6px;font-size:1.05rem}
+.card p{margin:0;font-size:.95rem}
+.card.ok{background:var(--ok-bg);border-color:transparent}.card.ok .ico{color:var(--ok)}
+.card.neutral{background:var(--neutral-bg);border-color:transparent}.card.neutral .ico{color:var(--muted)}
+.card.bad{background:var(--bad-bg);border-color:transparent}.card.bad .ico{color:var(--bad)}
+.ico{display:inline-flex;width:30px;height:30px;border-radius:50%;border:2px solid currentColor;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
+.note{font-size:.88rem;color:var(--muted)}
+.not li strong{white-space:nowrap}
+code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
+footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">Vox Trust</a>
+    <nav aria-label="Primary">
+      <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
+      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Draft spec</a>
+      <a href="/pt/" hreflang="pt-BR" lang="pt-BR">Português</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <span class="chip">Pre-alpha · draft spec 0.0 · not audited</span>
+      <h1>Vox Trust</h1>
+      <p class="tag">Don't detect fake voices. Prove real ones.</p>
+      <p class="lead">An open protocol and Rust reference implementation that seals a human voice at the source, so anyone can verify it later.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Read the draft spec</a>
+        <a class="btn" href="https://github.com/vox-trust/vox-trust">View on GitHub</a>
+      </div>
+    </div>
+
+    <section aria-labelledby="problem">
+      <h2 id="problem">The problem</h2>
+      <p>Cloning a voice now takes seconds of audio. Our ears can no longer tell a real voice from a cloned one, and detectors chase a moving target: as detection improves, so does generation.</p>
+    </section>
+
+    <section aria-labelledby="idea">
+      <h2 id="idea">Attest the real, don't guess the fake</h2>
+      <p>Instead of asking "is this voice fake?", Vox Trust asks "was a real one sealed?"</p>
+      <ol>
+        <li><strong>Seal.</strong> The speaker's device adds a signed seal to the audio at the source.</li>
+        <li><strong>Carry.</strong> The seal rides in a pluggable audio watermark, so it can survive re-recording and re-encoding. How well it survives is something we have to measure, in public.</li>
+        <li><strong>Verify.</strong> Anyone with the protocol checks which key sealed the audio, when, and which seconds were altered.</li>
+        <li><strong>Decide.</strong> A local trust policy turns the result into one of three outcomes.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="outcomes">
+      <h2 id="outcomes">Three outcomes</h2>
+      <div class="cards">
+        <div class="card ok">
+          <span class="ico" aria-hidden="true">✓</span>
+          <h3>Verified</h3>
+          <p>A valid seal from a key you trust.</p>
+        </div>
+        <div class="card neutral">
+          <span class="ico" aria-hidden="true">–</span>
+          <h3>Unsealed</h3>
+          <p>No seal, from someone who never used the protocol. Neutral, not "fake".</p>
+        </div>
+        <div class="card bad">
+          <span class="ico" aria-hidden="true">!</span>
+          <h3>Alert</h3>
+          <p>An invalid seal, or a missing one from a contact who always seals.</p>
+        </div>
+      </div>
+      <p class="note">Illustration of the policy outcomes. This is not a live demo: nothing on this page processes audio.</p>
+    </section>
+
+    <section aria-labelledby="not">
+      <h2 id="not">What it is not</h2>
+      <ul class="not">
+        <li>It is <strong>not</strong> deepfake detection and not voice biometrics.</li>
+        <li>It does <strong>not</strong> prove a speaker is human or is who they claim. It proves that <em>a key</em> sealed the audio. A stolen key makes valid seals.</li>
+        <li>"No seal" does <strong>not</strong> mean "fake": compression and noise suppression can erase a watermark.</li>
+        <li>It does not protect against someone who controls the sender's device.</li>
+      </ul>
+      <p>The full list of attackers and limits is in the <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/THREAT-MODEL.md">threat model</a>.</p>
+    </section>
+
+    <section aria-labelledby="status">
+      <h2 id="status">Where we are</h2>
+      <ul>
+        <li>A draft specification and threat model, open for criticism.</li>
+        <li>A small Rust crate with the seal layout and the trust-policy logic. No cryptography and no audio yet.</li>
+        <li><strong>Next:</strong> measure how seals survive real phone and app audio paths (Opus, AAC, MP3, AMR-WB, noise suppression), and publish the results whatever they are.</li>
+        <li>No live demo yet. We will not ship one that fakes verification.</li>
+      </ul>
+      <p>See the <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">roadmap</a>.</p>
+    </section>
+
+    <section aria-labelledby="prior">
+      <h2 id="prior">Built on, and next to, existing work</h2>
+      <p>Vox Trust is meant to complement these rather than replace them:</p>
+      <ul>
+        <li><a href="https://spec.c2pa.org/">C2PA</a> content credentials, which already use watermarks as "soft bindings".</li>
+        <li>Audio watermarks like <a href="https://github.com/facebookresearch/audioseal">AudioSeal</a> and <a href="https://github.com/wavmark/wavmark">WavMark</a>, which can serve as carriers.</li>
+        <li>Research on public-key speech provenance, e.g. <a href="https://arxiv.org/abs/2602.10166">MerkleSpeech</a>.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="help">
+      <h2 id="help">Help us break it</h2>
+      <p>The most useful thing right now is scrutiny: read the threat model, find the attacker we missed, or reproduce a measurement. Open an issue on <a href="https://github.com/vox-trust/vox-trust/issues">GitHub</a>. Report vulnerabilities privately, as described in the <a href="https://github.com/vox-trust/vox-trust/blob/main/SECURITY.md">security policy</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Code under <a href="https://github.com/vox-trust/vox-trust/blob/main/LICENSE">Apache-2.0</a>; specification text under CC BY 4.0. © 2026 Roger Oliveira and the Vox Trust contributors.</p>
+    <p>This site sets no cookies and loads nothing from third parties.</p>
+  </footer>
+</div>
+</body>
+</html>
