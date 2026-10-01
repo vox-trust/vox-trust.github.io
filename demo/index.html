@@ -1,156 +1,186 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vox Trust Demo</title>
-<meta name="description" content="Seal a voice clip, try to cheat, and watch the seal catch it. Runs entirely in your browser with the Vox Trust Rust core compiled to WebAssembly.">
+<title data-i18n="meta.title">Vox Trust demo: seal a voice, try to cheat it, verify in your browser</title>
+<meta name="description" data-i18n-content="meta.description" content="Seal a voice clip, try to cheat it, and verify the result. Runs in your browser: the Rust core compiled to WebAssembly, nothing is uploaded.">
+<link rel="canonical" href="https://vox-trust.github.io/demo/">
+<meta name="robots" content="index,follow">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbf9">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1013">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Vox Trust">
+<meta property="og:title" content="Vox Trust demo: seal a voice, try to cheat it, verify in your browser">
+<meta property="og:description" content="Seal a voice clip, try to cheat it, and verify the result. Runs in your browser: the Rust core compiled to WebAssembly, nothing is uploaded.">
+<meta property="og:url" content="https://vox-trust.github.io/demo/">
+<meta property="og:image" content="https://vox-trust.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Vox Trust: a sealed voice clip, and the seal catching a tampered one.">
+<meta name="twitter:card" content="summary_large_image">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; media-src blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Vox Trust demo",
+  "url": "https://vox-trust.github.io/demo/",
+  "description": "Seal a voice clip, try to cheat it, and verify the result. Runs in your browser: the Rust core compiled to WebAssembly, nothing is uploaded.",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Any (modern browser)",
+  "browserRequirements": "Requires WebAssembly",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "inLanguage": ["en", "pt-BR", "es", "zh-Hans", "ar"],
+  "isPartOf": { "@type": "WebSite", "name": "Vox Trust", "url": "https://vox-trust.github.io/" }
+}
+</script>
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
+<noscript><p class="noscript">This demo needs JavaScript and WebAssembly. Read the <a href="https://vox-trust.github.io/">overview</a> or browse the <a href="https://github.com/vox-trust/vox-trust">source code</a>.</p></noscript>
 <div class="wrap">
   <header class="top">
     <a class="brand" href="../">Vox Trust</a>
-    <nav aria-label="Primary">
-      <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
-      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Spec</a>
+    <nav aria-label="Primary" data-i18n-aria="nav.label">
+      <a href="https://github.com/vox-trust/vox-trust" data-i18n="nav.github">GitHub</a>
+      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md" data-i18n="nav.spec">Spec</a>
     </nav>
+    <select id="lang" class="lang" aria-label="Language" data-i18n-aria="lang.label"></select>
   </header>
 
   <main>
-    <h1>Seal it. Try to cheat. Watch it catch you.</h1>
-    <p class="lead">This demo runs the Vox Trust core (written in Rust, compiled to WebAssembly) <strong>entirely in your browser</strong>. Nothing is uploaded, and keys never leave this page.</p>
-    <p class="chip-row"><span class="chip">File mode · v0.1</span><span class="chip" id="coreStatus" role="status">Loading core…</span></p>
+    <h1 data-i18n="hero.title">Seal it. Try to cheat. Watch it catch you.</h1>
+    <p class="lead" data-i18n-rich="hero.lead">This demo runs the Vox Trust core (written in Rust, compiled to WebAssembly) <strong>entirely in your browser</strong>. Nothing is uploaded, and keys never leave this page.</p>
+    <p class="chip-row"><span class="chip" data-i18n="chip.mode">File mode · v0.1</span><span class="chip" id="coreStatus" role="status" hidden data-i18n="core.loading">Loading core…</span></p>
 
     <details class="scope">
-      <summary>What this demo is, and what it is not</summary>
+      <summary data-i18n="scope.summary">What this demo is, and what it is not</summary>
       <ul>
-        <li><strong>It is</strong> the real seal, signature, trust policy and tamper-localisation code, running as WebAssembly. The same code passes the published test vectors.</li>
-        <li><strong>File mode only survives bit-exact copies.</strong> Converting to MP3, resampling or re-recording changes every sample, so the seal reports the audio as modified. Surviving that is the job of the audio watermark carrier, which is <strong>not built yet</strong>. Try the "lossy" button to see exactly this.</li>
-        <li>Only the audio format and the samples are authenticated, not other metadata in the file.</li>
-        <li>It is pre-1.0 and <strong>has not been audited</strong>. Do not use it to protect anyone yet.</li>
+        <li data-i18n-rich="scope.is"><strong>It is</strong> the real seal, signature, trust policy and tamper-localisation code, running as WebAssembly. The same code passes the published test vectors.</li>
+        <li data-i18n-rich="scope.limit"><strong>File mode only survives bit-exact copies.</strong> Converting to MP3, resampling or re-recording changes every sample, so the seal reports the audio as modified. Surviving that is the job of the audio watermark carrier, which is <strong>not built yet</strong>. Try the "lossy" button to see exactly this.</li>
+        <li data-i18n-rich="scope.meta">Only the audio format and the samples are authenticated, not other metadata in the file.</li>
+        <li data-i18n-rich="scope.audit">It is pre-1.0 and <strong>has not been audited</strong>. Do not use it to protect anyone yet.</li>
       </ul>
     </details>
 
     <section aria-labelledby="s1">
-      <h2 id="s1"><span class="step">1</span> Pick some audio</h2>
+      <h2 id="s1" data-i18n="s1.title">1 · Pick some audio</h2>
       <div class="row">
-        <button type="button" id="useSample" class="primary">Use a sample clip</button>
-        <label class="btn">Choose an audio file… <input type="file" id="pickFile" class="visually-hidden" accept="audio/*"></label>
+        <button type="button" id="useSample" class="primary" disabled data-i18n="audio.useSample">Use a sample clip</button>
+        <label class="btn"><span data-i18n="audio.choose">Choose an audio file…</span> <input type="file" id="pickFile" class="visually-hidden" accept="audio/*"></label>
       </div>
-      <p class="note" id="audioInfo">No audio yet. Files are converted in your browser to 16 kHz mono (first 60 seconds).</p>
-      <canvas id="wave" class="wave" width="900" height="110" role="img" aria-label="Waveform of the audio"></canvas>
+      <p class="note" id="audioInfo" data-i18n="audio.none">No audio yet. Files are converted in your browser to 16 kHz mono (first 60 seconds).</p>
     </section>
 
     <section aria-labelledby="s2">
-      <h2 id="s2"><span class="step">2</span> Seal it</h2>
+      <h2 id="s2" data-i18n="s2.title">2 · Seal it</h2>
       <fieldset>
-        <legend>Mode</legend>
-        <label class="radio"><input type="radio" name="mode" value="circle" checked> <span><strong>Circle</strong> (shared passphrase)</span></label>
-        <label class="radio"><input type="radio" name="mode" value="public"> <span><strong>Public</strong> (Ed25519 key pair)</span></label>
+        <legend data-i18n="mode.legend">Mode</legend>
+        <label class="radio"><input type="radio" name="mode" value="circle" checked> <span data-i18n-rich="mode.circle"><strong>Circle</strong> (shared passphrase)</span></label>
+        <label class="radio"><input type="radio" name="mode" value="public"> <span data-i18n-rich="mode.public"><strong>Public</strong> (Ed25519 key pair)</span></label>
       </fieldset>
 
       <div id="circleBox" class="box">
-        <label for="sealPass">Passphrase</label>
-        <input type="text" id="sealPass" value="demo passphrase" autocomplete="off" spellcheck="false">
-        <p class="note">Demo only: the key is derived from this text (PBKDF2, 600,000 iterations). Real apps use random keys exchanged in person (for example by QR code).</p>
+        <label for="sealPass" data-i18n="seal.pass">Passphrase</label>
+        <input type="text" id="sealPass" dir="auto" value="demo passphrase" autocomplete="off" spellcheck="false">
+        <p class="note" data-i18n="seal.passNote">Demo only: the key is derived from this text (PBKDF2, 600,000 iterations). Real apps use random keys exchanged in person (for example by QR code).</p>
       </div>
       <div id="publicBox" class="box" hidden>
         <div class="row">
-          <button type="button" id="genKeys">Generate a key pair</button>
-          <button type="button" id="copyPub" disabled>Copy public key</button>
+          <button type="button" id="genKeys" data-i18n="keys.generate">Generate a key pair</button>
+          <button type="button" id="copyPub" disabled data-i18n="keys.copy">Copy public key</button>
         </div>
-        <p class="note" id="pubInfo">No key pair yet. The private key stays in memory in this page.</p>
+        <p class="note" id="pubInfo" data-i18n="pub.none">No key pair yet. The private key stays in memory in this page.</p>
       </div>
 
       <div class="row">
-        <label for="chunkSize">Chunk size</label>
+        <label for="chunkSize" data-i18n="chunkSize.label">Chunk size</label>
         <select id="chunkSize">
           <option value="8000">0.5 s</option>
           <option value="16000" selected>1 s</option>
           <option value="32000">2 s</option>
         </select>
-        <button type="button" id="sealBtn" class="primary" disabled>Seal</button>
+        <button type="button" id="sealBtn" class="primary" disabled data-i18n="seal.btn">Seal</button>
       </div>
       <p class="note" id="sealInfo"></p>
     </section>
 
     <section aria-labelledby="s3">
-      <h2 id="s3"><span class="step">3</span> Try to cheat</h2>
-      <p class="note">These act on the sealed audio, like someone editing it on the way. After each one, the verifier below re-checks.</p>
+      <h2 id="s3" data-i18n="s3.title">3 · Try to cheat</h2>
+      <p class="note" data-i18n="atk.note">These act on the sealed audio, like someone editing it on the way. After each one, the verifier below re-checks.</p>
       <div class="row">
-        <label for="atkChunk">Chunk</label>
+        <label for="atkChunk" data-i18n="atk.chunk">Chunk</label>
         <select id="atkChunk" disabled></select>
       </div>
       <div class="row wrap-row">
-        <button type="button" data-attack="silence" disabled>Replace chunk with silence</button>
-        <button type="button" data-attack="flip" disabled>Flip one bit in chunk</button>
-        <button type="button" data-attack="swap" disabled>Swap chunk with the next</button>
-        <button type="button" data-attack="strip" disabled>Strip the seal</button>
-        <button type="button" data-attack="lossy" disabled>Make it lossy (8-bit)</button>
-        <button type="button" data-attack="reseal" disabled>Re-seal as an attacker</button>
-        <button type="button" data-attack="reset" disabled>Reset</button>
+        <button type="button" data-attack="silence" disabled data-i18n="atk.silence">Replace chunk with silence</button>
+        <button type="button" data-attack="flip" disabled data-i18n="atk.flip">Flip one bit in chunk</button>
+        <button type="button" data-attack="swap" disabled data-i18n="atk.swap">Swap chunk with the next</button>
+        <button type="button" data-attack="strip" disabled data-i18n="atk.strip">Strip the seal</button>
+        <button type="button" data-attack="lossy" disabled data-i18n="atk.lossy">Make it lossy (8-bit)</button>
+        <button type="button" data-attack="reseal" disabled data-i18n="atk.reseal">Re-seal as an attacker</button>
+        <button type="button" data-attack="reset" disabled data-i18n="atk.reset">Reset</button>
       </div>
       <div class="player">
-        <audio id="player" controls preload="none"></audio>
-        <a id="download" class="btn" download="sealed.wav" hidden>Download this audio</a>
+        <audio id="player" controls preload="none" dir="ltr" aria-label="Audio player" data-i18n-aria="player.aria"></audio>
+        <a id="download" class="btn" download="sealed.wav" hidden data-i18n="player.download">Download this audio</a>
       </div>
     </section>
 
     <section aria-labelledby="s4">
-      <h2 id="s4"><span class="step">4</span> Verify</h2>
+      <h2 id="s4" data-i18n="s4.title">4 · Verify</h2>
       <div class="grid">
         <div>
-          <label for="verifyPass">Verifier's passphrase (circle mode)</label>
-          <input type="password" id="verifyPass" value="demo passphrase" autocomplete="off" spellcheck="false">
+          <label for="verifyPass" data-i18n="verify.pass">Verifier's passphrase (circle mode)</label>
+          <input type="password" id="verifyPass" dir="auto" value="demo passphrase" autocomplete="off" spellcheck="false">
         </div>
         <div>
-          <label for="pinned">Pinned public key (public mode, hex)</label>
-          <input type="text" id="pinned" placeholder="64 hex characters" autocomplete="off" spellcheck="false">
+          <label for="pinned" data-i18n="verify.pinned">Pinned public key (public mode, hex)</label>
+          <input type="text" id="pinned" dir="ltr" placeholder="64 hex characters" data-i18n-placeholder="verify.pinPlaceholder" autocomplete="off" spellcheck="false">
           <p class="note" id="pinInfo" role="status"></p>
-          <div class="row"><button type="button" id="forgetPin">Forget pinned key</button></div>
+          <div class="row"><button type="button" id="forgetPin" data-i18n="pin.forget">Forget pinned key</button></div>
         </div>
         <div>
-          <label for="contact">Who do you think this is?</label>
+          <label for="contact" data-i18n="contact.label">Who do you think this is?</label>
           <select id="contact">
-            <option value="stranger">A stranger</option>
-            <option value="always">A contact who always seals</option>
-            <option value="strict">Always seals, strict mode</option>
+            <option value="stranger" data-i18n="contact.stranger">A stranger</option>
+            <option value="always" data-i18n="contact.always">A contact who always seals</option>
+            <option value="strict" data-i18n="contact.strict">Always seals, strict mode</option>
           </select>
         </div>
       </div>
       <div class="row">
-        <button type="button" id="verifyBtn" class="primary" disabled>Verify</button>
-        <button type="button" id="forgetKeys">Forget keys</button>
-        <label class="btn">Verify a WAV file… <input type="file" id="verifyFile" class="visually-hidden" accept=".wav,audio/wav"></label>
+        <button type="button" id="verifyBtn" class="primary" disabled data-i18n="verify.btn">Verify</button>
+        <button type="button" id="forgetKeys" data-i18n="verify.forgetKeys">Forget keys</button>
+        <label class="btn"><span data-i18n="verify.file">Verify a WAV file…</span> <input type="file" id="verifyFile" class="visually-hidden" accept=".wav,audio/wav"></label>
       </div>
 
       <div id="verdict" class="verdict neutral" role="status" aria-live="polite">
-        <div class="v-icon" id="vIcon" aria-hidden="true">·</div>
-        <div>
-          <div class="v-title" id="vTitle">Nothing verified yet</div>
-          <div class="v-text" id="vText">Seal some audio, then verify it.</div>
-        </div>
+        <div class="v-title" id="vTitle" data-i18n="v.none.title">Nothing verified yet</div>
+        <div class="v-text" id="vText" data-i18n="v.none.text">Seal some audio, then verify it.</div>
       </div>
       <div id="chunksBox" hidden>
-        <h3>Chunks</h3>
-        <ol id="chunks" class="chunks" aria-label="Per-chunk result"></ol>
+        <h3 data-i18n="chunks.heading">Chunks</h3>
+        <ol id="chunks" class="chunks" aria-label="Per-chunk result" data-i18n-aria="chunks.aria"></ol>
         <p class="note" id="chunksNote"></p>
       </div>
       <details id="detailsBox" hidden>
-        <summary>Technical report</summary>
-        <pre id="report"></pre>
-        <div class="row"><button type="button" id="pinEmbedded" hidden>Pin this key (trust on first use)</button></div>
+        <summary data-i18n="report.summary">Technical report</summary>
+        <pre id="report" dir="ltr"></pre>
+        <div class="row"><button type="button" id="pinEmbedded" hidden data-i18n="pin.embedded">Pin this key (trust on first use)</button></div>
       </details>
     </section>
   </main>
 
   <footer>
-    <p>Source: <a href="https://github.com/vox-trust/vox-trust/tree/main/web">vox-trust/vox-trust, web/</a>. Code under Apache-2.0. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me noopener">Roger Oliveira</a> and the Vox Trust contributors.</p>
-    <p>This page sets no cookies and loads nothing from third parties.</p>
+    <p data-i18n-rich="footer.source">Source: <a href="https://github.com/vox-trust/vox-trust/tree/main/web">vox-trust/vox-trust, web/</a>. Code under Apache-2.0. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me noopener">Roger Oliveira</a> and the Vox Trust contributors.</p>
+    <p data-i18n="footer.privacy">This page sets no cookies and loads nothing from third parties.</p>
   </footer>
 </div>
 <script type="module" src="demo.js"></script>

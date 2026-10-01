@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vox Trust: prove real voices, don't detect fakes</title>
-<meta name="description" content="Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.2.0, file mode works, not audited.">
+<title>Vox Trust：为真实声音签章，而不是检测伪造</title>
+<meta name="description" content="开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.2.0，文件模式可用，尚未经过安全审计。">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="canonical" href="https://vox-trust.github.io/">
+<link rel="canonical" href="https://vox-trust.github.io/zh/">
 <link rel="alternate" hreflang="en" href="https://vox-trust.github.io/">
 <link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/">
 <link rel="alternate" hreflang="es" href="https://vox-trust.github.io/es/">
@@ -21,23 +21,23 @@
 <link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vox Trust">
-<meta property="og:title" content="Vox Trust: prove real voices, don't detect fakes">
-<meta property="og:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.2.0, not audited.">
-<meta property="og:url" content="https://vox-trust.github.io/">
-<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Vox Trust：为真实声音签章，而不是检测伪造">
+<meta property="og:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.2.0，尚未经过安全审计。">
+<meta property="og:url" content="https://vox-trust.github.io/zh/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:locale:alternate" content="es_ES">
-<meta property="og:locale:alternate" content="zh_CN">
 <meta property="og:locale:alternate" content="ar_AR">
 <meta property="og:image" content="https://vox-trust.github.io/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Vox Trust logo and the line: Don't detect fake voices. Prove real ones.">
+<meta property="og:image:alt" content="Vox Trust 标志和标语：不去检测伪造的声音，而是证明真实的声音。">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Vox Trust: prove real voices, don't detect fakes">
-<meta name="twitter:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.2.0, not audited.">
+<meta name="twitter:title" content="Vox Trust：为真实声音签章，而不是检测伪造">
+<meta name="twitter:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.2.0，尚未经过安全审计。">
 <meta name="twitter:image" content="https://vox-trust.github.io/og.png">
-<meta name="twitter:image:alt" content="Vox Trust logo and the line: Don't detect fake voices. Prove real ones.">
+<meta name="twitter:image:alt" content="Vox Trust 标志和标语：不去检测伪造的声音，而是证明真实的声音。">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -55,11 +55,11 @@
   },
   {
    "@type": "WebPage",
-   "@id": "https://vox-trust.github.io/#page",
-   "url": "https://vox-trust.github.io/",
-   "name": "Vox Trust: prove real voices, don't detect fakes",
-   "description": "Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.2.0, file mode works, not audited.",
-   "inLanguage": "en",
+   "@id": "https://vox-trust.github.io/zh/#page",
+   "url": "https://vox-trust.github.io/zh/",
+   "name": "Vox Trust：为真实声音签章，而不是检测伪造",
+   "description": "开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.2.0，文件模式可用，尚未经过安全审计。",
+   "inLanguage": "zh-Hans",
    "isPartOf": {
     "@id": "https://vox-trust.github.io/#site"
    },
@@ -150,119 +150,119 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">跳到正文</a>
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="/">Vox Trust</a>
-    <nav aria-label="Primary">
+    <a class="brand" href="/zh/">Vox Trust</a>
+    <nav aria-label="主导航">
       <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
-      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Draft spec</a>
+      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">规范草案</a>
     </nav>
   </header>
-  <nav class="langs" aria-label="Language">
+  <nav class="langs" aria-label="语言">
     <ul>
-        <li><a href="/" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="/" hreflang="en" lang="en">English</a></li>
         <li><a href="/pt/" hreflang="pt-BR" lang="pt-BR">Português</a></li>
         <li><a href="/es/" hreflang="es" lang="es">Español</a></li>
-        <li><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
         <li><a href="/ar/" hreflang="ar" lang="ar">العربية</a></li>
     </ul>
   </nav>
 
   <main id="main">
     <div class="hero">
-      <span class="chip">v0.2.0 · file mode works · not audited</span>
+      <span class="chip">v0.2.0 · 文件模式可用 · 未经审计</span>
       <h1>Vox Trust</h1>
-      <p class="tag">Don't detect fake voices. Prove real ones.</p>
-      <p class="lead">An open protocol and Rust reference implementation that seals a human voice at the source, so anyone can verify it later.</p>
+      <p class="tag">不去检测伪造的声音，而是证明真实的声音。</p>
+      <p class="lead">一个开放协议及其 Rust 参考实现：在源头为人声签章，让任何人日后都能验证。</p>
       <div class="actions">
-        <a class="btn primary" href="/demo/?lang=en">Try the live demo</a>
-        <a class="btn" href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Read the draft spec</a>
-        <a class="btn" href="https://github.com/vox-trust/vox-trust">View on GitHub</a>
+        <a class="btn primary" href="/demo/?lang=zh-Hans">试用在线演示</a>
+        <a class="btn" href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">阅读规范草案</a>
+        <a class="btn" href="https://github.com/vox-trust/vox-trust">在 GitHub 上查看</a>
       </div>
     </div>
 
     <section aria-labelledby="problem">
-      <h2 id="problem">The problem</h2>
-      <p>Cloning a voice now takes seconds of audio. Our ears can no longer tell a real voice from a cloned one, and detectors chase a moving target: as detection improves, so does generation.</p>
+      <h2 id="problem">问题所在</h2>
+      <p>如今只需几秒钟的录音就能克隆一个人的声音。我们的耳朵已经分不出真假，而检测工具总是在追赶一个不断移动的目标：检测越进步，生成也越进步。</p>
     </section>
 
     <section aria-labelledby="idea">
-      <h2 id="idea">Attest the real, don't guess the fake</h2>
-      <p>Instead of asking "is this voice fake?", Vox Trust asks "was a real one sealed?"</p>
+      <h2 id="idea">证明真实，而不是猜测伪造</h2>
+      <p>Vox Trust 不问“这段声音是假的吗?”,而是问“真实的声音有没有被签章?”</p>
       <ol>
-        <li><strong>Seal.</strong> The speaker's device adds a signed seal to the audio at the source.</li>
-        <li><strong>Carry.</strong> The plan is for the seal to ride in a pluggable audio watermark, so it can survive re-recording and re-encoding. That carrier is not built yet, and how well it survives is something we have to measure, in public.</li>
-        <li><strong>Verify.</strong> Anyone with the protocol checks which key sealed the audio, when, and which seconds were altered.</li>
-        <li><strong>Decide.</strong> A local trust policy turns the result into one of four verdicts.</li>
+        <li><strong>签章。</strong>说话者的设备在源头为音频加上带数字签名的签章。</li>
+        <li><strong>携带。</strong>我们的设想是让签章藏在可插拔的音频水印中，以便在重新录制、重新编码后仍能留存。这一载体目前尚未实现，留存效果究竟如何，必须公开实测。</li>
+        <li><strong>验证。</strong>任何使用该协议的人都可以查看是哪把密钥、在何时为音频签章，以及哪几秒被改动过。</li>
+        <li><strong>判定。</strong>本地信任策略会把结果归为四种裁决之一。</li>
       </ol>
     </section>
 
     <section aria-labelledby="outcomes">
-      <h2 id="outcomes">Four verdicts</h2>
+      <h2 id="outcomes">四种裁决</h2>
       <div class="cards">
         <div class="card ok">
-          <h3>Verified</h3>
-          <p>A valid seal from a key you trust.</p>
+          <h3>已验证</h3>
+          <p>来自你所信任密钥的有效签章。</p>
         </div>
         <div class="card neutral">
-          <h3>Unsealed</h3>
-          <p>No seal, from someone who never used the protocol. Neutral, not "fake".</p>
+          <h3>未签章</h3>
+          <p>没有签章，对方可能从未用过该协议。这是中性结果，不等于“伪造”。</p>
         </div>
         <div class="card warn">
-          <h3>Warning</h3>
-          <p>No seal from a contact who usually seals. Be careful, and ask them to send it again.</p>
+          <h3>警告</h3>
+          <p>对方通常会签章，这次却没有。请谨慎对待，并请对方重新发送。</p>
         </div>
         <div class="card bad">
-          <h3>Alert</h3>
-          <p>A broken seal, a seal from a different key than the one you have for that contact, or none from a contact who always seals in strict mode.</p>
+          <h3>警报</h3>
+          <p>签章已损坏；或签章所用密钥与你为该联系人保存的不一致；或在严格模式下，始终签章的联系人这次没有签章。</p>
         </div>
       </div>
-      <p class="note">Illustration of the policy verdicts. The <a href="/demo/?lang=en">live demo</a> runs the real Rust core in your browser; nothing is uploaded.</p>
+      <p class="note">以上为策略裁决的示意。<a href="/demo/?lang=zh-Hans">在线演示</a>在你的浏览器中运行真实的 Rust 核心，不会上传任何内容。</p>
     </section>
 
     <section aria-labelledby="not">
-      <h2 id="not">What it is not</h2>
+      <h2 id="not">它不是什么</h2>
       <ul>
-        <li>It is <strong>not</strong> deepfake detection and not voice biometrics.</li>
-        <li>It does <strong>not</strong> prove a speaker is human or is who they claim. It proves that <em>a key</em> sealed the audio. A stolen key makes valid seals.</li>
-        <li>"No seal" does <strong>not</strong> mean "fake": compression and noise suppression can erase a watermark.</li>
-        <li>It does not protect against someone who controls the sender's device.</li>
+        <li>它<strong>不是</strong>深度伪造检测，也不是声纹识别。</li>
+        <li>它<strong>不能</strong>证明说话者是真人，或确是其自称的那个人；它只证明<em>某把密钥</em>为这段音频签了章。密钥被盗，同样会产生有效签章。</li>
+        <li>“未签章”<strong>不等于</strong>“伪造”:压缩和降噪都可能抹掉水印。</li>
+        <li>它无法防范控制了发送方设备的人。</li>
       </ul>
-      <p>The full list of attackers and limits is in the <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/THREAT-MODEL.md">threat model</a> (in English).</p>
+      <p>完整的攻击者与局限清单见<a href="https://github.com/vox-trust/vox-trust/blob/main/spec/THREAT-MODEL.md">威胁模型</a>（英文）。</p>
     </section>
 
     <section aria-labelledby="status">
-      <h2 id="status">Where we are</h2>
+      <h2 id="status">目前进展</h2>
       <ul>
-        <li>A draft specification and threat model, open for criticism.</li>
-        <li>A Rust reference implementation with file mode (a signed per-chunk manifest inside a WAV file), trust policy, a command-line tool and a WebAssembly build. Test vectors are published and cross-checked by a second, Python implementation written by the same author.</li>
-        <li>A <a href="/demo/?lang=en">live demo</a> that really verifies. Sealed files survive only bit-exact copies: the in-band audio watermark is not built yet.</li>
-        <li><strong>Not audited.</strong> No independent review yet. Do not use it to protect anyone.</li>
-        <li><strong>Next:</strong> build the carrier, measure how seals survive real phone and app audio paths (Opus, AAC, MP3, AMR-WB, noise suppression), and publish the results whatever they are.</li>
+        <li>规范草案与威胁模型，欢迎批评指正。</li>
+        <li>Rust 参考实现，包含文件模式（在 WAV 文件内嵌入按分段签名的清单）、信任策略、命令行工具和 WebAssembly 构建。测试向量已公开，并由同一作者编写的 Python 实现交叉验证。</li>
+        <li>一个真正能完成验证的<a href="/demo/?lang=zh-Hans">在线演示</a>。签章过的文件只在逐比特一致的副本中有效：音频内嵌水印尚未实现。</li>
+        <li><strong>未经审计。</strong>目前没有独立评审，请勿用它来保护任何人。</li>
+        <li><strong>下一步:</strong>实现载体，实测签章在真实的手机与应用音频链路(Opus、AAC、MP3、AMR-WB、降噪）中的留存情况，无论结果如何都公开发布。</li>
       </ul>
-      <p>See the <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">roadmap</a> (in English).</p>
+      <p>参见<a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">路线图</a>（英文）。</p>
     </section>
 
     <section aria-labelledby="prior">
-      <h2 id="prior">Built on, and next to, existing work</h2>
-      <p>Vox Trust is meant to complement these rather than replace them:</p>
+      <h2 id="prior">站在已有工作的肩上，与之并肩</h2>
+      <p>Vox Trust 的定位是补充这些工作，而不是取代它们:</p>
       <ul>
-        <li><a href="https://spec.c2pa.org/">C2PA</a> content credentials, which already use watermarks as "soft bindings".</li>
-        <li>Audio watermarks like <a href="https://github.com/facebookresearch/audioseal">AudioSeal</a> and <a href="https://github.com/wavmark/wavmark">WavMark</a>, which can serve as carriers.</li>
-        <li>Research on public-key speech provenance, e.g. <a href="https://arxiv.org/abs/2602.10166">MerkleSpeech</a>.</li>
+        <li><a href="https://spec.c2pa.org/">C2PA</a> 内容凭证，它已经把水印用作“软绑定”。</li>
+        <li><a href="https://github.com/facebookresearch/audioseal">AudioSeal</a>、<a href="https://github.com/wavmark/wavmark">WavMark</a> 等音频水印，可以充当载体。</li>
+        <li>公钥语音溯源方面的研究，例如 <a href="https://arxiv.org/abs/2602.10166">MerkleSpeech</a>。</li>
       </ul>
     </section>
 
     <section aria-labelledby="help">
-      <h2 id="help">Help us break it</h2>
-      <p>The most useful thing right now is scrutiny: read the threat model, find the attacker we missed, or reproduce a measurement. Open an issue on <a href="https://github.com/vox-trust/vox-trust/issues">GitHub</a>. Report vulnerabilities privately, as described in the <a href="https://github.com/vox-trust/vox-trust/blob/main/SECURITY.md">security policy</a>.</p>
+      <h2 id="help">请帮我们找漏洞</h2>
+      <p>现在最有价值的是审视：阅读威胁模型，找出我们漏掉的攻击者，或复现一项测量。欢迎在 <a href="https://github.com/vox-trust/vox-trust/issues">GitHub</a> 上提交 issue。安全漏洞请按<a href="https://github.com/vox-trust/vox-trust/blob/main/SECURITY.md">安全政策</a>的说明私下报告。</p>
     </section>
   </main>
 
   <footer>
-    <p>Code under <a href="https://github.com/vox-trust/vox-trust/blob/main/LICENSE">Apache-2.0</a>; specification text under CC BY 4.0. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me">Roger Oliveira</a> and the Vox Trust contributors.</p>
-    <p>This site sets no cookies and loads nothing from third parties.</p>
+    <p>代码采用 <a href="https://github.com/vox-trust/vox-trust/blob/main/LICENSE">Apache-2.0</a> 许可；规范文本采用 CC BY 4.0。© 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me">Roger Oliveira</a> 与 Vox Trust 贡献者。</p>
+    <p>本站不设置 Cookie，也不加载任何第三方资源。</p>
   </footer>
 </div>
 </body>

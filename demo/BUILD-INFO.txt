@@ -1,4 +1,4 @@
 source:  https://github.com/vox-trust/vox-trust
-commit:  72ea15d77f52193fdffa63b1dddc9bed39db394e
+commit:  7669ca743252c0a56879e472c2eff2d56afee8ff
 rustc:   rustc 1.94.1 (e408947bf 2026-03-25)
-sha256:  7618cc70565c618214eff106df7abbc6dd53ae0f6e498165cc3c67137a0222b5  vox_trust.wasm
+sha256:  02b6f2bd9de1f0b4df2e33270f16545418d1a84d5434ac84fbffe1e61cd53bed  vox_trust.wasm

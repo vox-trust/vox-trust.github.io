@@ -8,10 +8,13 @@ const ABI_VERSION = 1;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+/** Error with a stable machine-readable `code` (and `params`) so UIs can localize the message. */
+export const coded = (code, message, params = {}) => Object.assign(new Error(message), { code, params });
+
 export const hex = (bytes) => Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 
 export const unhex = (text) => {
-  if (text.length % 2 !== 0 || /[^0-9a-f]/i.test(text)) throw new Error("invalid hex");
+  if (text.length % 2 !== 0 || /[^0-9a-f]/i.test(text)) throw coded("invalid_hex", "invalid hex");
   const out = new Uint8Array(text.length / 2);
   for (let i = 0; i < out.length; i++) out[i] = parseInt(text.slice(2 * i, 2 * i + 2), 16);
   return out;
@@ -33,13 +36,13 @@ export async function loadVoxTrust(source) {
   let bytes = source;
   if (typeof source === "string" || source instanceof URL) {
     const response = await fetch(source);
-    if (!response.ok) throw new Error(`could not load the WebAssembly core: HTTP ${response.status}`);
+    if (!response.ok) throw coded("core_http", `could not load the WebAssembly core: HTTP ${response.status}`, { status: response.status });
     bytes = await response.arrayBuffer();
   }
   const { instance } = await WebAssembly.instantiate(bytes, {});
   const x = instance.exports;
   if (x.vt_abi_version() !== ABI_VERSION) {
-    throw new Error(`unsupported core ABI version ${x.vt_abi_version()}, expected ${ABI_VERSION}`);
+    throw coded("core_abi", `unsupported core ABI version ${x.vt_abi_version()}, expected ${ABI_VERSION}`, { got: x.vt_abi_version(), expected: ABI_VERSION });
   }
 
   // Copies `data` into the module and records the block in `held`, so the caller's `finally`
@@ -180,7 +183,7 @@ export async function loadVoxTrust(source) {
 export function wavInfo(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const tag = (o) => String.fromCharCode(bytes[o], bytes[o + 1], bytes[o + 2], bytes[o + 3]);
-  if (bytes.length < 12 || tag(0) !== "RIFF" || tag(8) !== "WAVE") throw new Error("not a WAV file");
+  if (bytes.length < 12 || tag(0) !== "RIFF" || tag(8) !== "WAVE") throw coded("not_wav", "not a WAV file");
   const info = { channels: 0, sampleRate: 0, bits: 0, pcmOffset: -1, pcmLength: 0, manifestOffset: -1, manifestLength: 0, chunks: [] };
   let pos = 12;
   while (pos + 8 <= bytes.length) {
@@ -201,7 +204,7 @@ export function wavInfo(bytes) {
     }
     pos = start + size + (size & 1);
   }
-  if (info.pcmOffset < 0 || info.bits !== 16) throw new Error("only 16-bit PCM WAV is supported");
+  if (info.pcmOffset < 0 || info.bits !== 16) throw coded("only_pcm16", "only 16-bit PCM WAV is supported");
   return info;
 }
 

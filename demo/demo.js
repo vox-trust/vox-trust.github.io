@@ -1,5 +1,6 @@
 // Vox Trust browser demo (file mode). Everything runs locally; nothing is uploaded.
-import { deriveCircleKey, encodeWav, hex, loadVoxTrust, stripManifest, unhex, wavInfo } from "./vox-trust.js";
+import { DEFAULT_LANG, LANGS, LINKS, isolate, langByCode, loadDict, matchLang, translate, translatePlural, user } from "./i18n/index.js";
+import { coded, deriveCircleKey, encodeWav, hex, loadVoxTrust, stripManifest, unhex, wavInfo } from "./vox-trust.js";
 
 const RATE = 16000;
 const MAX_SECONDS = 60;
@@ -7,6 +8,7 @@ const MAX_FILE_BYTES = 200 * 1024 * 1024;
 const MAX_CHUNK_ITEMS = 200;
 const MAX_LISTED = 20;
 const MAX_REPORT_CHARS = 20000;
+const CORE_TIMEOUT_MS = 30000;
 const $ = (id) => document.getElementById(id);
 
 const state = {
@@ -14,19 +16,165 @@ const state = {
   samples: null, // Int16Array, mono
   original: null, // unsealed WAV bytes
   sealed: null, // sealed WAV bytes
-  current: null, // what the verifier sees (sealed, then possibly tampered)
+  current: null, // the demo's own audio: sealed, then possibly tampered by the attack buttons
+  external: null, // a WAV file the visitor asked to verify; it is never attacked and never feeds chunk sizes
   seed: null,
   publicKey: null,
   sealKeyId: 0,
   counter: 1,
-  chunkFrames: 16000,
+  chunkFrames: 16000, // chunk size of the demo's own sealed audio, set only by doSeal
   blobUrl: null,
   embeddedKey: null,
+  lang: DEFAULT_LANG,
+  view: null, // the verified report on screen: { report, verdict }; text is re-rendered from it, never re-verified
 };
 
 let verifyGen = 0;
 
-const tooBig = (file) => `That file is ${(file.size / 1048576).toFixed(0)} MB. This demo accepts files up to ${MAX_FILE_BYTES / 1048576} MB.`;
+// ---------------------------------------------------------------- i18n
+
+const LANG_STORAGE_KEY = "vox-trust-lang";
+// Params may be plain values, user(text) (outside text, always isolated), { k, p, n } (a translated string,
+// plural when n is given) or an Error (localised when it carries a code).
+function resolve(params) {
+  const source = typeof params === "function" ? params() : params || {};
+  const out = {};
+  for (const [name, value] of Object.entries(source)) {
+    if (value instanceof Error) out[name] = localizeError(value);
+    else if (value && typeof value === "object" && "k" in value) out[name] = t(value.k, value.p, value.n);
+    else out[name] = value;
+  }
+  return out;
+}
+
+// With a count, `key` is a plural base and the language's plural category picks the message.
+const t = (key, params, count) => (count === undefined ? translate(state.lang, key, resolve(params)) : translatePlural(state.lang, key, count, resolve(params)));
+const nf = (n, digits = 0) =>
+  new Intl.NumberFormat(langByCode(state.lang).locale, { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false }).format(n);
+
+function localizeError(error) {
+  const code = error && error.code;
+  if (code && Object.hasOwn(langByCode(DEFAULT_LANG).dict, `err.${code}`)) return t(`err.${code}`, error.params);
+  return error && error.message ? error.message : String(error);
+}
+
+// Dynamic texts are stored as closures, so a language change re-renders them from the same data.
+const texts = new Map();
+const msg = (key, params, count) => () => t(key, params, count);
+const raw = (text) => () => text;
+
+function setText(id, make) {
+  texts.set(id, make);
+  $(id).textContent = make();
+}
+
+function clearText(id) {
+  texts.delete(id);
+  $(id).textContent = "";
+}
+
+function applyStatic() {
+  for (const el of document.querySelectorAll("[data-i18n]")) if (!texts.has(el.id)) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-rich]")) renderRich(el, t(el.dataset.i18nRich));
+  for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+  for (const el of document.querySelectorAll("[data-i18n-content]")) el.setAttribute("content", t(el.dataset.i18nContent));
+  document.title = t("meta.title");
+  for (const option of $("chunkSize").options) option.textContent = t("unit.s", { n: nf(Number(option.value) / RATE, Number(option.value) % RATE === 0 ? 0 : 1) });
+}
+
+// **bold** and [text](linkId) only (ids live in LINKS); everything else is plain text, so strings can never inject markup.
+function renderRich(el, text) {
+  const nodes = [];
+  let last = 0;
+  for (const m of text.matchAll(/\*\*(.+?)\*\*|\[(.+?)\]\((\w+)\)/g)) {
+    if (m.index > last) nodes.push(document.createTextNode(text.slice(last, m.index)));
+    if (m[1] !== undefined) {
+      const strong = document.createElement("strong");
+      strong.textContent = m[1];
+      nodes.push(strong);
+    } else if (Object.hasOwn(LINKS, m[3])) {
+      const link = LINKS[m[3]];
+      const a = document.createElement("a");
+      a.textContent = m[2];
+      a.href = link.href;
+      a.className = link.cls;
+      if (link.rel) a.rel = link.rel;
+      nodes.push(a);
+    } else {
+      nodes.push(document.createTextNode(m[2])); // unknown link id: keep the words, drop the link
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) nodes.push(document.createTextNode(text.slice(last)));
+  el.replaceChildren(...nodes);
+}
+
+function initialLang() {
+  const query = matchLang(new URLSearchParams(location.search).get("lang"));
+  if (query) return query;
+  try {
+    const stored = matchLang(localStorage.getItem(LANG_STORAGE_KEY));
+    if (stored) return stored;
+  } catch {
+    /* storage unavailable */
+  }
+  for (const tag of navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language]) {
+    const found = matchLang(tag);
+    if (found) return found;
+  }
+  return DEFAULT_LANG;
+}
+
+let langGen = 0;
+
+async function setLanguage(code, { persist = false, url = false } = {}) {
+  const lang = langByCode(code);
+  const gen = ++langGen;
+  try {
+    await loadDict(lang.code);
+  } catch {
+    /* offline or blocked: the English fallback keeps the page usable */
+  }
+  if (gen !== langGen) return; // a newer choice superseded this one while it loaded
+  state.lang = lang.code;
+  const root = document.documentElement;
+  root.lang = lang.code;
+  root.dir = lang.dir;
+  $("lang").value = lang.code;
+  applyStatic();
+  for (const [id, make] of texts) $(id).textContent = make();
+  if (state.view) {
+    renderChunks(state.view.report);
+    $("report").textContent = reportText(state.view.report, state.view.verdict);
+  }
+  if (persist) {
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang.code);
+    } catch {
+      /* storage unavailable */
+    }
+  }
+  if (url) {
+    const next = new URL(location.href);
+    next.searchParams.set("lang", lang.code);
+    history.replaceState(null, "", next);
+  }
+}
+
+function buildLangSelect() {
+  const select = $("lang");
+  for (const l of LANGS) {
+    const option = document.createElement("option");
+    option.value = l.code;
+    option.textContent = l.name;
+    option.lang = l.code;
+    select.append(option);
+  }
+  select.addEventListener("change", () => void setLanguage(select.value, { persist: true, url: true }));
+}
+
+const tooBig = (file) => msg("problem.tooLargeText", { size: (file.size / 1048576).toFixed(0), max: MAX_FILE_BYTES / 1048576 });
 
 // ---------------------------------------------------------------- keys
 
@@ -109,53 +257,6 @@ async function decodeFile(file) {
   return { samples: out, truncated: decoded.duration > MAX_SECONDS };
 }
 
-function samplesOf(bytes) {
-  const info = wavInfo(bytes);
-  const view = new DataView(bytes.buffer, bytes.byteOffset + info.pcmOffset, info.pcmLength);
-  const out = new Int16Array(info.pcmLength >> 1);
-  for (let i = 0; i < out.length; i++) out[i] = view.getInt16(2 * i, true);
-  return { samples: out, info };
-}
-
-function drawWave(samples, { badChunks = [], chunkFrames = 0, channels = 1 } = {}) {
-  const canvas = $("wave");
-  const ctx = canvas.getContext("2d");
-  const { width: w, height: h } = canvas;
-  ctx.clearRect(0, 0, w, h);
-  if (!samples || samples.length === 0) return;
-  const css = getComputedStyle(document.documentElement);
-  const color = css.getPropertyValue("--wave").trim() || "#3b4a63";
-  const bad = css.getPropertyValue("--wave-bad").trim() || "#a0222a";
-  const frames = Math.floor(samples.length / channels);
-  if (chunkFrames > 0 && frames / chunkFrames <= 2000) {
-    ctx.globalAlpha = 0.2;
-    ctx.fillStyle = bad;
-    for (const i of badChunks) {
-      const x0 = ((i * chunkFrames) / frames) * w;
-      const x1 = Math.min(w, (((i + 1) * chunkFrames) / frames) * w);
-      ctx.fillRect(x0, 0, x1 - x0, h);
-    }
-    ctx.globalAlpha = 0.35;
-    ctx.fillStyle = color;
-    for (let i = 1; i * chunkFrames < frames; i++) ctx.fillRect(Math.round(((i * chunkFrames) / frames) * w), 0, 1, h);
-  }
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = color;
-  const mid = h / 2;
-  for (let x = 0; x < w; x++) {
-    const a = Math.floor((x / w) * frames);
-    const b = Math.max(a + 1, Math.floor(((x + 1) / w) * frames));
-    let lo = 0;
-    let hi = 0;
-    for (let f = a; f < b && f < frames; f += Math.max(1, (b - a) >> 4)) {
-      const s = samples[f * channels] / 32768;
-      if (s < lo) lo = s;
-      if (s > hi) hi = s;
-    }
-    ctx.fillRect(x, mid - hi * mid, 1, Math.max(1, (hi - lo) * mid));
-  }
-}
-
 function showAudio(bytes) {
   if (state.blobUrl) URL.revokeObjectURL(state.blobUrl);
   state.blobUrl = URL.createObjectURL(new Blob([bytes], { type: "audio/wav" }));
@@ -181,7 +282,7 @@ function setDownloadName(verdict, report) {
 
 // ---------------------------------------------------------------- UI helpers
 
-const fmtSeconds = (frames, rate) => `${(frames / rate).toFixed(frames % rate === 0 ? 0 : 1)} s`;
+const fmtSeconds = (frames, rate) => t("unit.s", { n: nf(frames / rate, frames % rate === 0 ? 0 : 1) });
 
 function setBusy(on) {
   document.body.style.cursor = on ? "progress" : "";
@@ -205,23 +306,25 @@ function fillChunkSelect(chunks) {
 
 function resetVerdict() {
   verifyGen++; // a verification still in flight belongs to the old audio
-  setVerdictBox("neutral", "·", "Nothing verified yet", "Seal some audio, then verify it.");
+  state.view = null;
+  setVerdictBox("neutral", msg("v.none.title"), msg("v.none.text"));
   $("chunksBox").hidden = true;
   $("detailsBox").hidden = true;
 }
 
 function setAudio(samples, label) {
+  // label: a { k, p } translated string or a plain file name
   state.samples = samples;
   state.original = encodeWav(samples, RATE, 1);
   state.sealed = null;
   state.current = null;
-  $("audioInfo").textContent = `${label}: ${(samples.length / RATE).toFixed(1)} s, ${RATE / 1000} kHz mono, ${(state.original.length / 1024).toFixed(0)} KB.`;
-  drawWave(samples);
+  state.external = null;
+  setText("audioInfo", msg("audio.info", { label, seconds: nf(samples.length / RATE, 1), khz: RATE / 1000, kb: (state.original.length / 1024).toFixed(0) }));
   showAudio(state.original);
   $("sealBtn").disabled = !state.vt;
   $("verifyBtn").disabled = !state.vt;
   setAttackEnabled(false);
-  $("sealInfo").textContent = "";
+  clearText("sealInfo");
   resetVerdict();
 }
 
@@ -233,12 +336,12 @@ function selectedMode() {
 
 function setPublicInfo() {
   if (!state.publicKey) {
-    $("pubInfo").textContent = "No key pair yet. The private key stays in memory in this page.";
+    setText("pubInfo", msg("pub.none"));
     $("copyPub").disabled = true;
     return;
   }
   const h = hex(state.publicKey);
-  $("pubInfo").textContent = `Public key: ${h.slice(0, 16)}…${h.slice(-8)} (the full key was pinned for you below; the private key stays in this page).`;
+  setText("pubInfo", msg("pub.info", { key: `${h.slice(0, 16)}…${h.slice(-8)}` }));
   $("copyPub").disabled = false;
 }
 
@@ -258,7 +361,7 @@ async function doSeal() {
     try {
       ({ key, keyId } = await circleKey($("sealPass").value));
     } catch (error) {
-      $("sealInfo").textContent = `Could not derive the key: ${error.message}`;
+      setText("sealInfo", msg("seal.keyError", { error }));
       return;
     }
   } else {
@@ -278,16 +381,17 @@ async function doSeal() {
       chunkFrames: state.chunkFrames,
     });
   } catch (error) {
-    $("sealInfo").textContent = `Could not seal: ${error.message}`;
+    setText("sealInfo", msg("seal.error", { error }));
     return;
   } finally {
     setBusy(false);
   }
   state.current = state.sealed;
+  state.external = null;
   const chunks = Math.ceil(state.samples.length / state.chunkFrames);
   fillChunkSelect(chunks);
   setAttackEnabled(true);
-  $("sealInfo").textContent = `Sealed in ${mode} mode: ${chunks} chunks, ${state.sealed.length - state.original.length} bytes added to the file. The audio samples are untouched.`;
+  setText("sealInfo", msg("seal.done", { mode: { k: `mode.name.${mode}` }, chunks, bytes: state.sealed.length - state.original.length }, chunks));
   showAudio(state.current);
   await runVerify();
 }
@@ -303,6 +407,15 @@ function chunkRange(index, info, chunkFrames) {
 
 async function attack(kind) {
   if (!state.sealed) return;
+  try {
+    await applyAttack(kind);
+  } catch (error) {
+    verifyGen++;
+    showProblem(msg("problem.attackTitle"), () => localizeError(error));
+  }
+}
+
+async function applyAttack(kind) {
   let bytes = state.current.slice();
   const info = wavInfo(bytes);
   const index = Number($("atkChunk").value || 0);
@@ -317,7 +430,7 @@ async function attack(kind) {
     case "swap": {
       const [s2, e2] = chunkRange(index + 1, info, state.chunkFrames);
       if (e2 - s2 !== end - start || e2 <= s2) {
-        $("sealInfo").textContent = "Pick a chunk that has a full-size chunk after it to swap with.";
+        setText("sealInfo", msg("atk.swapNeedsNext"));
         return;
       }
       const a = bytes.slice(start, end);
@@ -351,8 +464,9 @@ async function attack(kind) {
     default:
       return;
   }
-  if (kind !== "swap") $("sealInfo").textContent = "";
+  if (kind !== "swap") clearText("sealInfo");
   state.current = bytes;
+  state.external = null;
   showAudio(bytes);
   await runVerify();
 }
@@ -370,36 +484,43 @@ function contactFromSelect() {
   }
 }
 
+const listOf = (a) => {
+  const shown = a.slice(0, MAX_LISTED).map(String).join(t("list.sep"));
+  return a.length > MAX_LISTED ? t("list.more", { list: shown, n: a.length - MAX_LISTED }) : shown;
+};
+
+// Returns translation keys (never prose), so the same report can be shown again in another language.
 function explain(report, verdict) {
-  const list = (a) => (a.length > MAX_LISTED ? `${a.slice(0, MAX_LISTED).join(", ")} and ${a.length - MAX_LISTED} more` : a.join(", "));
   switch (verdict) {
     case "verified":
-      return ["Verified", "Sealed by a key you trust, and the audio is exactly as it was sealed."];
+      return { title: "v.verified.title", text: "v.verified.text" };
     case "unsealed":
-      if (report.check === "unknown_key") {
-        return ["Unsealed", "A seal exists, but under a key you don't trust (yet). Nothing is verified. Check the key another way before pinning it."];
-      }
-      return ["Unsealed", "No seal found. That is normal for someone who doesn't use the protocol, so it does not mean the audio is fake. It also means nothing was verified."];
+      return { title: "v.unsealed.title", text: report.check === "unknown_key" ? "v.unsealed.unknownKey" : "v.unsealed.absent" };
     case "warning":
-      return ["No seal, from someone who usually seals", "Be careful. Compression or noise suppression can also erase a seal, so ask them to send it again, or confirm another way."];
+      return { title: "v.warning.title", text: "v.warning.text" };
     default:
       break;
   }
-  if (report.check === "absent") return ["Alert: no seal (strict mode)", "This contact always seals, and this audio has no seal."];
-  if (report.check === "unknown_key") return ["Alert: sealed by a different key", "This audio is sealed, but not by the key you have for this contact. Someone may be impersonating them."];
+  if (report.check === "absent") return { title: "v.alert.absent.title", text: "v.alert.absent.text" };
+  if (report.check === "unknown_key") return { title: "v.alert.unknownKey.title", text: "v.alert.unknownKey.text" };
   switch (report.reason) {
     case "modified":
-      return ["Alert: the audio was changed", `The seal is genuine but the audio no longer matches it. Altered chunk${report.modified_chunks.length === 1 ? "" : "s"}: ${list(report.modified_chunks)}.`];
+      return {
+        title: "v.alert.modified.title",
+        text: "v.alert.modified.text",
+        count: report.modified_chunks.length,
+        params: () => ({ list: listOf(report.modified_chunks) }),
+      };
     case "format_changed":
-      return ["Alert: length or format changed", "The audio's length, sample rate or channel count differs from what was sealed."];
+      return { title: "v.alert.format.title", text: "v.alert.format.text" };
     case "bad_authenticator":
-      return ["Alert: the seal does not match your key", "Wrong passphrase, or someone forged or altered the seal."];
+      return { title: "v.alert.auth.title", text: "v.alert.auth.text" };
     case "bad_signature":
-      return ["Alert: broken signature", "The seal was altered after it was made."];
+      return { title: "v.alert.sig.title", text: "v.alert.sig.text" };
     case "unsupported_version":
-      return ["Alert: unknown seal version", "This file was sealed with a version this demo does not understand."];
+      return { title: "v.alert.version.title", text: "v.alert.version.text" };
     default:
-      return ["Alert: damaged seal", "The seal in this file is malformed."];
+      return { title: "v.alert.damaged.title", text: "v.alert.damaged.text" };
   }
 }
 
@@ -416,9 +537,11 @@ function renderChunks(report) {
     // The count comes from the file; never build an unbounded list of elements from it.
     if (report.authenticated) {
       const n = report.modified_chunks.length;
-      $("chunksNote").textContent = `${report.n_chunks} chunks (too many to list). ${n === 0 ? "All are intact." : `${n} altered: ${report.modified_chunks.slice(0, MAX_LISTED).join(", ")}${n > MAX_LISTED ? ` and ${n - MAX_LISTED} more` : ""}.`}`;
+      setText("chunksNote", () =>
+        t("chunks.tooMany", { n: report.n_chunks, detail: n === 0 ? t("chunks.allIntact") : t("chunks.someAltered", { n, list: listOf(report.modified_chunks) }) }),
+      );
     } else {
-      $("chunksNote").textContent = "Chunk results are not shown: the seal itself is not trusted.";
+      setText("chunksNote", msg("chunks.hidden"));
     }
     return;
   }
@@ -430,61 +553,54 @@ function renderChunks(report) {
     if (!report.authenticated) {
       item.className = "unknown";
       strong.textContent = "?";
-      status = "can't tell";
+      status = t("chunk.unknown");
     } else if (bad.has(i)) {
       item.className = "bad";
       strong.textContent = "✕";
-      status = "altered";
+      status = t("chunk.bad");
     } else {
       item.className = "ok";
       strong.textContent = "✓";
-      status = "intact";
+      status = t("chunk.ok");
     }
     const from = fmtSeconds(i * report.chunk_frames, report.sample_rate);
     item.append(strong, document.createTextNode(`${from}`), document.createElement("br"), document.createTextNode(status));
-    item.setAttribute("aria-label", `Chunk ${i} from ${from}: ${status}`);
+    item.setAttribute("aria-label", t("chunk.aria", { i, from, status }));
     list.append(item);
   }
-  $("chunksNote").textContent = report.authenticated
-    ? "Chunk results are trustworthy because the seal itself verified."
-    : "Chunk results are not shown as fact: the seal itself is not trusted, so the chunk list could be forged.";
+  setText("chunksNote", msg(report.authenticated ? "chunks.trusted" : "chunks.untrusted"));
 }
 
-function render(report, verdict, bytes) {
-  const [title, text] = explain(report, verdict);
-  setVerdictBox(verdict, { verified: "✓", unsealed: "–", warning: "!", alert: "✕" }[verdict], title, text);
+// The report itself is protocol output and stays as-is (LTR, English keys); only the truncation note is translated.
+function reportText(report, verdict) {
+  let json = JSON.stringify(report, null, 2);
+  if (json.length > MAX_REPORT_CHARS) json = `${json.slice(0, MAX_REPORT_CHARS)}\n${t("report.truncated")}`;
+  return `${json}\n\nverdict: ${verdict}`;
+}
+
+function render(report, verdict) {
+  const e = explain(report, verdict);
+  setVerdictBox(verdict, msg(e.title), msg(e.text, e.params, e.count));
+  state.view = { report, verdict };
   setDownloadName(verdict, report);
   renderChunks(report);
   $("detailsBox").hidden = false;
-  let json = JSON.stringify(report, null, 2);
-  if (json.length > MAX_REPORT_CHARS) json = `${json.slice(0, MAX_REPORT_CHARS)}\n… (truncated)`;
-  $("report").textContent = `${json}\n\nverdict: ${verdict}`;
+  $("report").textContent = reportText(report, verdict);
   state.embeddedKey = report.embedded_public_key && report.check === "unknown_key" ? report.embedded_public_key : null;
   $("pinEmbedded").hidden = !state.embeddedKey;
-  try {
-    const { samples, info } = samplesOf(bytes);
-    // Boundaries and altered-chunk shading come from the seal, so only an authenticated seal may draw them.
-    drawWave(samples, {
-      badChunks: report.authenticated ? report.modified_chunks : [],
-      chunkFrames: report.authenticated ? report.chunk_frames || 0 : 0,
-      channels: info.channels,
-    });
-  } catch {
-    /* not drawable */
-  }
 }
 
-function setVerdictBox(kind, icon, title, text) {
+function setVerdictBox(kind, title, text) {
   const box = $("verdict");
   box.className = `verdict ${kind}`;
   box.setAttribute("role", "status");
-  $("vIcon").textContent = icon;
-  $("vTitle").textContent = title;
-  $("vText").textContent = text;
+  setText("vTitle", title);
+  setText("vText", text);
 }
 
 function showProblem(title, text) {
-  setVerdictBox("alert", "✕", title, text);
+  state.view = null;
+  setVerdictBox("alert", title, text);
   $("verdict").setAttribute("role", "alert");
   $("chunksBox").hidden = true;
   $("detailsBox").hidden = true;
@@ -496,17 +612,19 @@ function showProblem(title, text) {
 function updatePinInfo() {
   const raw = $("pinned").value.trim();
   const ok = raw === "" || /^[0-9a-fA-F]{64}$/.test(raw);
-  $("pinInfo").textContent = ok ? "" : `Not a valid public key: expected 64 hex characters (0-9, a-f), got ${raw.length}. It is being ignored.`;
+  if (ok) clearText("pinInfo");
+  else setText("pinInfo", msg("pin.invalid", { n: raw.length }));
   $("pinned").setAttribute("aria-invalid", ok ? "false" : "true");
   return ok;
 }
 
 async function runVerify() {
   const gen = ++verifyGen;
-  const bytes = state.current;
+  const bytes = state.external || state.current;
   if (!state.vt || !bytes) return;
   // Clear first: a slow or failing run must never leave the previous verdict on screen.
-  setVerdictBox("neutral", "·", "Verifying…", "Checking the seal.");
+  state.view = null;
+  setVerdictBox("neutral", msg("v.checking.title"), msg("v.checking.text"));
   $("chunksBox").hidden = true;
   $("detailsBox").hidden = true;
   $("download").download = "unverified.wav";
@@ -523,32 +641,31 @@ async function runVerify() {
     if (updatePinInfo() && pinned) trust.pinnedPublicKey = unhex(pinned);
     const report = state.vt.verify(bytes, trust);
     if (gen !== verifyGen) return;
-    if (report.chunk_frames) state.chunkFrames = report.chunk_frames;
-    render(report, state.vt.decide(report.check, contactFromSelect()), bytes);
+    render(report, state.vt.decide(report.check, contactFromSelect()));
   } catch (error) {
     if (gen !== verifyGen) return;
-    showProblem("Could not verify this file", error && error.message ? error.message : String(error));
+    showProblem(msg("problem.title"), () => localizeError(error));
   }
 }
 
 // ---------------------------------------------------------------- wiring
 
 function wire() {
-  $("useSample").addEventListener("click", () => setAudio(makeSample(), "Sample clip"));
+  $("useSample").addEventListener("click", () => setAudio(makeSample(), { k: "audio.sample" }));
   $("pickFile").addEventListener("change", async (event) => {
     const file = event.target.files[0];
     event.target.value = "";
     if (!file) return;
     if (file.size > MAX_FILE_BYTES) {
-      $("audioInfo").textContent = tooBig(file);
+      setText("audioInfo", tooBig(file));
       return;
     }
-    $("audioInfo").textContent = "Decoding…";
+    setText("audioInfo", msg("audio.decoding"));
     try {
       const { samples, truncated } = await decodeFile(file);
-      setAudio(samples, truncated ? `${file.name} (first ${MAX_SECONDS} s)` : file.name);
+      setAudio(samples, truncated ? { k: "audio.truncated", p: { name: user(file.name), n: MAX_SECONDS } } : user(file.name));
     } catch {
-      $("audioInfo").textContent = "Your browser could not decode that file. Try a WAV, MP3 or M4A.";
+      setText("audioInfo", msg("audio.decodeFail"));
     }
   });
   document.querySelectorAll('input[name="mode"]').forEach((radio) =>
@@ -562,8 +679,11 @@ function wire() {
   $("copyPub").addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(hex(state.publicKey));
-      $("copyPub").textContent = "Copied";
-      setTimeout(() => ($("copyPub").textContent = "Copy public key"), 1500);
+      setText("copyPub", msg("keys.copied"));
+      setTimeout(() => {
+        texts.delete("copyPub");
+        $("copyPub").textContent = t("keys.copy");
+      }, 1500);
     } catch {
       /* clipboard unavailable */
     }
@@ -594,35 +714,49 @@ function wire() {
     if (!file) return;
     verifyGen++; // drop any run still in flight for the previous file
     if (file.size > MAX_FILE_BYTES) {
-      showProblem("File too large", tooBig(file));
+      showProblem(msg("problem.tooLarge"), tooBig(file));
       return;
     }
-    setVerdictBox("neutral", "·", "Reading…", file.name);
+    setVerdictBox("neutral", msg("v.reading.title"), () => isolate(file.name));
     try {
-      state.current = new Uint8Array(await file.arrayBuffer());
+      state.external = new Uint8Array(await file.arrayBuffer());
     } catch (error) {
-      showProblem("Could not read this file", error.message);
+      showProblem(msg("problem.readTitle"), () => localizeError(error));
       return;
     }
-    showAudio(state.current);
+    showAudio(state.external);
     $("verifyBtn").disabled = false;
     await runVerify();
   });
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => state.samples && runVerify());
+}
+
+function loadCore() {
+  if (typeof WebAssembly !== "object") return Promise.reject(coded("no_wasm", "WebAssembly is not supported"));
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(coded("core_timeout", "loading the core timed out")), CORE_TIMEOUT_MS);
+  });
+  return Promise.race([loadVoxTrust(new URL("./vox_trust.wasm", import.meta.url)), timeout]).finally(() => clearTimeout(timer));
 }
 
 async function init() {
+  $("coreStatus").hidden = false;
+  buildLangSelect();
   wire();
+  await setLanguage(initialLang());
   try {
-    state.vt = await loadVoxTrust(new URL("./vox_trust.wasm", import.meta.url));
-    $("coreStatus").textContent = `Core ready · ABI ${state.vt.abiVersion()}`;
+    state.vt = await loadCore();
+    setText("coreStatus", msg("core.ready", { abi: state.vt.abiVersion() }));
     $("useSample").disabled = false;
   } catch (error) {
-    $("coreStatus").textContent = "Core failed to load";
-    $("audioInfo").textContent = `The WebAssembly core could not be loaded: ${error.message}`;
+    // "Loading core…" must never stay on screen: show a visible, announced failure instead.
+    $("coreStatus").classList.add("err");
+    $("coreStatus").setAttribute("role", "alert");
+    setText("coreStatus", msg("core.failed"));
+    setText("audioInfo", msg("core.loadError", { error }));
     return;
   }
-  setAudio(makeSample(), "Sample clip");
+  setAudio(makeSample(), { k: "audio.sample" });
 }
 
 init();
