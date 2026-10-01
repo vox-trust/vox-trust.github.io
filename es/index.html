@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vox Trust: prueba la voz real, no cazes falsas</title>
-<meta name="description" content="Protocolo abierto, con implementación de referencia en Rust, que sella la voz humana en origen para que cualquiera pueda verificarla. v0.2.0, sin auditar.">
+<meta name="description" content="Protocolo abierto, con implementación de referencia en Rust, que sella la voz humana en origen para que cualquiera pueda verificarla. v0.3.0, sin auditar.">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)">
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vox Trust">
 <meta property="og:title" content="Vox Trust: prueba la voz real, no cazes falsas">
-<meta property="og:description" content="Un protocolo abierto que sella la voz humana en origen para que cualquiera pueda verificarla. v0.2.0, sin auditar.">
+<meta property="og:description" content="Un protocolo abierto que sella la voz humana en origen para que cualquiera pueda verificarla. v0.3.0, sin auditar.">
 <meta property="og:url" content="https://vox-trust.github.io/es/">
 <meta property="og:locale" content="es_ES">
 <meta property="og:locale:alternate" content="en_US">
@@ -35,7 +35,7 @@
 <meta property="og:image:alt" content="Logotipo de Vox Trust y la frase: No detectes voces falsas. Prueba las reales.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vox Trust: prueba la voz real, no cazes falsas">
-<meta name="twitter:description" content="Un protocolo abierto que sella la voz humana en origen para que cualquiera pueda verificarla. v0.2.0, sin auditar.">
+<meta name="twitter:description" content="Un protocolo abierto que sella la voz humana en origen para que cualquiera pueda verificarla. v0.3.0, sin auditar.">
 <meta name="twitter:image" content="https://vox-trust.github.io/og.png">
 <meta name="twitter:image:alt" content="Logotipo de Vox Trust y la frase: No detectes voces falsas. Prueba las reales.">
 <script type="application/ld+json">
@@ -58,7 +58,7 @@
    "@id": "https://vox-trust.github.io/es/#page",
    "url": "https://vox-trust.github.io/es/",
    "name": "Vox Trust: prueba la voz real, no cazes falsas",
-   "description": "Protocolo abierto, con implementación de referencia en Rust, que sella la voz humana en origen para que cualquiera pueda verificarla. v0.2.0, sin auditar.",
+   "description": "Protocolo abierto, con implementación de referencia en Rust, que sella la voz humana en origen para que cualquiera pueda verificarla. v0.3.0, sin auditar.",
    "inLanguage": "es",
    "isPartOf": {
     "@id": "https://vox-trust.github.io/#site"
@@ -81,7 +81,7 @@
    "codeRepository": "https://github.com/vox-trust/vox-trust",
    "programmingLanguage": "Rust",
    "license": "https://www.apache.org/licenses/LICENSE-2.0",
-   "version": "0.2.0",
+   "version": "0.3.0",
    "author": {
     "@type": "Person",
     "name": "Roger Oliveira",
@@ -171,7 +171,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 
   <main id="main">
     <div class="hero">
-      <span class="chip">v0.2.0 · el modo archivo funciona · sin auditar</span>
+      <span class="chip">v0.3.0 · el modo archivo funciona · sin auditar</span>
       <h1>Vox Trust</h1>
       <p class="tag">No detectes voces falsas. Prueba las reales.</p>
       <p class="lead">Un protocolo abierto, con implementación de referencia en Rust, que sella la voz humana en origen para que cualquiera pueda verificarla después.</p>
@@ -192,7 +192,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p>En lugar de preguntar "¿esta voz es falsa?", Vox Trust pregunta "¿se selló una voz real?"</p>
       <ol>
         <li><strong>Sellar.</strong> El dispositivo de quien habla añade al audio un sello firmado, en origen.</li>
-        <li><strong>Transportar.</strong> La idea es que el sello viaje en una marca de agua de audio intercambiable, para que pueda sobrevivir a una regrabación o a una recodificación. Ese portador aún no está construido, y cuánto sobrevive el sello es algo que debemos medir, en público.</li>
+        <li><strong>Transportar.</strong> El sello puede viajar en una marca de agua de audio intercambiable, para sobrevivir a la recodificación. Un primer portador, experimental, está construido y <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>medido en público</a>: sobrevive a MP3, AAC y Opus, pero no a los códecs de llamadas telefónicas ni al ruido.</li>
         <li><strong>Verificar.</strong> Cualquiera que use el protocolo comprueba qué clave selló el audio, cuándo y qué segundos fueron alterados.</li>
         <li><strong>Decidir.</strong> Una política de confianza local convierte el resultado en uno de cuatro veredictos.</li>
       </ol>
@@ -237,9 +237,9 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <ul>
         <li>Un borrador de especificación y de modelo de amenazas, abierto a críticas.</li>
         <li>Una implementación de referencia en Rust con modo archivo (un manifiesto firmado por fragmento dentro de un WAV), política de confianza, herramienta de línea de comandos y compilación a WebAssembly. Los vectores de prueba están publicados y los contrasta una segunda implementación en Python, escrita por el mismo autor.</li>
-        <li>Una <a href="/demo/?lang=es">demo en vivo</a> que verifica de verdad. Los archivos sellados solo sobreviven a copias idénticas bit a bit: la marca de agua de audio integrada aún no está construida.</li>
+        <li>Una <a href="/demo/?lang=es">demo en vivo</a> que verifica de verdad. Los archivos sellados solo sobreviven a copias idénticas bit a bit; los veredictos salen solo del modo archivo.</li>
         <li><strong>Sin auditar.</strong> Todavía no hay revisión independiente. No lo uses para proteger a nadie.</li>
-        <li><strong>Siguiente paso:</strong> construir el portador, medir cómo sobreviven los sellos a las rutas de audio reales de teléfonos y aplicaciones (Opus, AAC, MP3, AMR-WB, supresión de ruido) y publicar los resultados, sean los que sean.</li>
+        <li><strong>Medido:</strong> la marca de agua experimental conserva el sello en MP3 y AAC (100 %), Opus 32 kbit/s (99 %) y Opus 24 kbit/s (93 %), sin falsas alarmas, pero falla en llamadas telefónicas (AMR-WB), con ruido y con eco. No superó nuestro propio criterio, y un sello dentro del audio puede copiarse a otro audio, así que todavía no da veredictos. <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>Resultados completos</a> (en inglés).</li>
       </ul>
       <p>Consulta la <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">hoja de ruta</a> (en inglés).</p>
     </section>
