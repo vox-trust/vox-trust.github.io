@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vox Trust Demo</title>
+<meta name="description" content="Seal a voice clip, try to cheat, and watch the seal catch it. Runs entirely in your browser with the Vox Trust Rust core compiled to WebAssembly.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../">Vox Trust</a>
+    <nav aria-label="Primary">
+      <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
+      <a href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Spec</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Seal it. Try to cheat. Watch it catch you.</h1>
+    <p class="lead">This demo runs the Vox Trust core (written in Rust, compiled to WebAssembly) <strong>entirely in your browser</strong>. Nothing is uploaded, and keys never leave this page.</p>
+    <p class="chip-row"><span class="chip">File mode · v0.1</span><span class="chip" id="coreStatus" role="status">Loading core…</span></p>
+
+    <details class="scope">
+      <summary>What this demo is, and what it is not</summary>
+      <ul>
+        <li><strong>It is</strong> the real seal, signature, trust policy and tamper-localisation code, running as WebAssembly. The same code passes the published test vectors.</li>
+        <li><strong>File mode only survives bit-exact copies.</strong> Converting to MP3, resampling or re-recording changes every sample, so the seal reports the audio as modified. Surviving that is the job of the audio watermark carrier, which is <strong>not built yet</strong>. Try the "lossy" button to see exactly this.</li>
+        <li>Only the audio format and the samples are authenticated, not other metadata in the file.</li>
+        <li>It is pre-1.0 and <strong>has not been audited</strong>. Do not use it to protect anyone yet.</li>
+      </ul>
+    </details>
+
+    <section aria-labelledby="s1">
+      <h2 id="s1"><span class="step">1</span> Pick some audio</h2>
+      <div class="row">
+        <button type="button" id="useSample" class="primary">Use a sample clip</button>
+        <label class="btn" for="pickFile">Choose an audio file…</label>
+        <input type="file" id="pickFile" accept="audio/*" hidden>
+      </div>
+      <p class="note" id="audioInfo">No audio yet. Files are converted in your browser to 16 kHz mono (first 60 seconds).</p>
+      <canvas id="wave" class="wave" width="900" height="110" role="img" aria-label="Waveform of the audio"></canvas>
+    </section>
+
+    <section aria-labelledby="s2">
+      <h2 id="s2"><span class="step">2</span> Seal it</h2>
+      <fieldset>
+        <legend>Mode</legend>
+        <label class="radio"><input type="radio" name="mode" value="circle" checked> <span><strong>Circle</strong> (shared passphrase)</span></label>
+        <label class="radio"><input type="radio" name="mode" value="public"> <span><strong>Public</strong> (Ed25519 key pair)</span></label>
+      </fieldset>
+
+      <div id="circleBox" class="box">
+        <label for="sealPass">Passphrase</label>
+        <input type="text" id="sealPass" value="demo passphrase" autocomplete="off" spellcheck="false">
+        <p class="note">Demo only: the key is derived from this text. Real apps use random keys exchanged in person (for example by QR code).</p>
+      </div>
+      <div id="publicBox" class="box" hidden>
+        <div class="row">
+          <button type="button" id="genKeys">Generate a key pair</button>
+          <button type="button" id="copyPub" disabled>Copy public key</button>
+        </div>
+        <p class="note" id="pubInfo">No key pair yet. The private key stays in memory in this page.</p>
+      </div>
+
+      <div class="row">
+        <label for="chunkSize">Chunk size</label>
+        <select id="chunkSize">
+          <option value="8000">0.5 s</option>
+          <option value="16000" selected>1 s</option>
+          <option value="32000">2 s</option>
+        </select>
+        <button type="button" id="sealBtn" class="primary" disabled>Seal</button>
+      </div>
+      <p class="note" id="sealInfo"></p>
+    </section>
+
+    <section aria-labelledby="s3">
+      <h2 id="s3"><span class="step">3</span> Try to cheat</h2>
+      <p class="note">These act on the sealed audio, like someone editing it on the way. After each one, the verifier below re-checks.</p>
+      <div class="row">
+        <label for="atkChunk">Chunk</label>
+        <select id="atkChunk" disabled></select>
+      </div>
+      <div class="row wrap-row">
+        <button type="button" data-attack="silence" disabled>Replace chunk with silence</button>
+        <button type="button" data-attack="flip" disabled>Flip one bit in chunk</button>
+        <button type="button" data-attack="swap" disabled>Swap chunk with the next</button>
+        <button type="button" data-attack="strip" disabled>Strip the seal</button>
+        <button type="button" data-attack="lossy" disabled>Make it lossy (8-bit)</button>
+        <button type="button" data-attack="reseal" disabled>Re-seal as an attacker</button>
+        <button type="button" data-attack="reset" disabled>Reset</button>
+      </div>
+      <div class="player">
+        <audio id="player" controls preload="none"></audio>
+        <a id="download" class="btn" download="sealed.wav" hidden>Download this audio</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="s4">
+      <h2 id="s4"><span class="step">4</span> Verify</h2>
+      <div class="grid">
+        <div>
+          <label for="verifyPass">Verifier's passphrase (circle mode)</label>
+          <input type="text" id="verifyPass" value="demo passphrase" autocomplete="off" spellcheck="false">
+        </div>
+        <div>
+          <label for="pinned">Pinned public key (public mode, hex)</label>
+          <input type="text" id="pinned" placeholder="64 hex characters" autocomplete="off" spellcheck="false">
+          <div class="row"><button type="button" id="forgetPin">Forget pinned key</button></div>
+        </div>
+        <div>
+          <label for="contact">Who do you think this is?</label>
+          <select id="contact">
+            <option value="stranger">A stranger</option>
+            <option value="always">A contact who always seals</option>
+            <option value="strict">Always seals, strict mode</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="verifyBtn" class="primary" disabled>Verify</button>
+        <label class="btn" for="verifyFile">Verify a WAV file…</label>
+        <input type="file" id="verifyFile" accept=".wav,audio/wav" hidden>
+      </div>
+
+      <div id="verdict" class="verdict neutral" role="status" aria-live="polite">
+        <div class="v-icon" id="vIcon" aria-hidden="true">·</div>
+        <div>
+          <div class="v-title" id="vTitle">Nothing verified yet</div>
+          <div class="v-text" id="vText">Seal some audio, then verify it.</div>
+        </div>
+      </div>
+      <div id="chunksBox" hidden>
+        <h3>Chunks</h3>
+        <ol id="chunks" class="chunks" aria-label="Per-chunk result"></ol>
+        <p class="note" id="chunksNote"></p>
+      </div>
+      <details id="detailsBox" hidden>
+        <summary>Technical report</summary>
+        <pre id="report"></pre>
+        <div class="row"><button type="button" id="pinEmbedded" hidden>Pin this key (trust on first use)</button></div>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Source: <a href="https://github.com/vox-trust/vox-trust/tree/main/web">vox-trust/vox-trust, web/</a>. Code under Apache-2.0. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me noopener">Roger Oliveira</a> and the Vox Trust contributors.</p>
+    <p>This page sets no cookies and loads nothing from third parties.</p>
+  </footer>
+</div>
+<script type="module" src="demo.js"></script>
+</body>
+</html>

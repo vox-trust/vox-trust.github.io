@@ -73,12 +73,13 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 
   <main>
     <div class="hero">
-      <span class="chip">Pré-alfa · spec rascunho 0.0 · sem auditoria</span>
+      <span class="chip">v0.1.0 · modo arquivo funciona · sem auditoria</span>
       <h1>Vox Trust</h1>
       <p class="tag">Não detecte vozes falsas. Prove as reais.</p>
       <p class="lead">Um protocolo aberto, com implementação de referência em Rust, que sela a voz humana na origem para que qualquer pessoa possa verificá-la depois.</p>
       <div class="actions">
-        <a class="btn primary" href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Ler a spec (rascunho)</a>
+        <a class="btn primary" href="/demo/">Testar a demo ao vivo</a>
+        <a class="btn" href="https://github.com/vox-trust/vox-trust/blob/main/spec/SPEC.md">Ler a spec (rascunho)</a>
         <a class="btn" href="https://github.com/vox-trust/vox-trust">Ver no GitHub</a>
       </div>
     </div>
@@ -118,7 +119,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
           <p>Um selo inválido, ou a ausência dele num contato que sempre sela.</p>
         </div>
       </div>
-      <p class="note">Ilustração dos desfechos da política. Isto não é uma demo ao vivo: nada nesta página processa áudio.</p>
+      <p class="note">Ilustração dos desfechos da política. A <a href="/demo/">demo ao vivo</a> roda o núcleo Rust de verdade no seu navegador; nada é enviado.</p>
     </section>
 
     <section aria-labelledby="not">
@@ -136,9 +137,9 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <h2 id="status">Onde estamos</h2>
       <ul>
         <li>Um rascunho de especificação e de modelo de ameaças, aberto a críticas.</li>
-        <li>Um pequeno crate em Rust com o formato do selo e a lógica da política de confiança. Ainda sem criptografia e sem áudio.</li>
+        <li>Uma implementação de referência em Rust com modo arquivo (manifesto assinado por trecho dentro de um WAV), política de confiança, ferramenta de linha de comando e build WebAssembly. Vetores de teste publicados e conferidos por uma segunda implementação, em Python.</li>
         <li><strong>Próximo passo:</strong> medir como os selos sobrevivem a caminhos reais de áudio de telefone e de apps (Opus, AAC, MP3, AMR-WB, redução de ruído) e publicar os resultados, sejam quais forem.</li>
-        <li>Ainda não há demo ao vivo. Não vamos publicar uma que simule a verificação.</li>
+        <li>Uma <a href="/demo/">demo ao vivo</a> que verifica de verdade. Arquivos selados sobrevivem só a cópias idênticas: a marca d'água de áudio ainda não existe.</li>
       </ul>
       <p>Veja o <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">roadmap</a> (em inglês).</p>
     </section>
