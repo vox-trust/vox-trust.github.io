@@ -6,6 +6,7 @@
 <title>Vox Trust Demo</title>
 <meta name="description" content="Seal a voice clip, try to cheat, and watch the seal catch it. Runs entirely in your browser with the Vox Trust Rust core compiled to WebAssembly.">
 <meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; media-src blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="demo.css">
 </head>
@@ -38,8 +39,7 @@
       <h2 id="s1"><span class="step">1</span> Pick some audio</h2>
       <div class="row">
         <button type="button" id="useSample" class="primary">Use a sample clip</button>
-        <label class="btn" for="pickFile">Choose an audio file…</label>
-        <input type="file" id="pickFile" accept="audio/*" hidden>
+        <label class="btn">Choose an audio file… <input type="file" id="pickFile" class="visually-hidden" accept="audio/*"></label>
       </div>
       <p class="note" id="audioInfo">No audio yet. Files are converted in your browser to 16 kHz mono (first 60 seconds).</p>
       <canvas id="wave" class="wave" width="900" height="110" role="img" aria-label="Waveform of the audio"></canvas>
@@ -56,7 +56,7 @@
       <div id="circleBox" class="box">
         <label for="sealPass">Passphrase</label>
         <input type="text" id="sealPass" value="demo passphrase" autocomplete="off" spellcheck="false">
-        <p class="note">Demo only: the key is derived from this text. Real apps use random keys exchanged in person (for example by QR code).</p>
+        <p class="note">Demo only: the key is derived from this text (PBKDF2, 600,000 iterations). Real apps use random keys exchanged in person (for example by QR code).</p>
       </div>
       <div id="publicBox" class="box" hidden>
         <div class="row">
@@ -105,11 +105,12 @@
       <div class="grid">
         <div>
           <label for="verifyPass">Verifier's passphrase (circle mode)</label>
-          <input type="text" id="verifyPass" value="demo passphrase" autocomplete="off" spellcheck="false">
+          <input type="password" id="verifyPass" value="demo passphrase" autocomplete="off" spellcheck="false">
         </div>
         <div>
           <label for="pinned">Pinned public key (public mode, hex)</label>
           <input type="text" id="pinned" placeholder="64 hex characters" autocomplete="off" spellcheck="false">
+          <p class="note" id="pinInfo" role="status"></p>
           <div class="row"><button type="button" id="forgetPin">Forget pinned key</button></div>
         </div>
         <div>
@@ -123,8 +124,8 @@
       </div>
       <div class="row">
         <button type="button" id="verifyBtn" class="primary" disabled>Verify</button>
-        <label class="btn" for="verifyFile">Verify a WAV file…</label>
-        <input type="file" id="verifyFile" accept=".wav,audio/wav" hidden>
+        <button type="button" id="forgetKeys">Forget keys</button>
+        <label class="btn">Verify a WAV file… <input type="file" id="verifyFile" class="visually-hidden" accept=".wav,audio/wav"></label>
       </div>
 
       <div id="verdict" class="verdict neutral" role="status" aria-live="polite">

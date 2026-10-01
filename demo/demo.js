@@ -3,6 +3,10 @@ import { deriveCircleKey, encodeWav, hex, loadVoxTrust, stripManifest, unhex, wa
 
 const RATE = 16000;
 const MAX_SECONDS = 60;
+const MAX_FILE_BYTES = 200 * 1024 * 1024;
+const MAX_CHUNK_ITEMS = 200;
+const MAX_LISTED = 20;
+const MAX_REPORT_CHARS = 20000;
 const $ = (id) => document.getElementById(id);
 
 const state = {
@@ -17,11 +21,30 @@ const state = {
   counter: 1,
   chunkFrames: 16000,
   blobUrl: null,
+  embeddedKey: null,
 };
+
+let verifyGen = 0;
+
+const tooBig = (file) => `That file is ${(file.size / 1048576).toFixed(0)} MB. This demo accepts files up to ${MAX_FILE_BYTES / 1048576} MB.`;
 
 // ---------------------------------------------------------------- keys
 
 const keyCache = new Map();
+
+function forgetKeys() {
+  for (const { key } of keyCache.values()) key.fill(0);
+  keyCache.clear();
+  if (state.seed) state.seed.fill(0);
+  state.seed = null;
+  state.publicKey = null;
+  state.embeddedKey = null;
+  $("sealPass").value = "";
+  $("verifyPass").value = "";
+  $("pinned").value = "";
+  setPublicInfo();
+  updatePinInfo();
+}
 
 async function circleKey(passphrase) {
   if (!keyCache.has(passphrase)) {
@@ -104,7 +127,7 @@ function drawWave(samples, { badChunks = [], chunkFrames = 0, channels = 1 } = {
   const color = css.getPropertyValue("--wave").trim() || "#3b4a63";
   const bad = css.getPropertyValue("--wave-bad").trim() || "#a0222a";
   const frames = Math.floor(samples.length / channels);
-  if (chunkFrames > 0) {
+  if (chunkFrames > 0 && frames / chunkFrames <= 2000) {
     ctx.globalAlpha = 0.2;
     ctx.fillStyle = bad;
     for (const i of badChunks) {
@@ -146,7 +169,14 @@ function showAudio(bytes) {
   } catch {
     sealed = false;
   }
-  link.download = sealed ? "sealed.wav" : "unsealed.wav";
+  link.download = sealed ? "unverified.wav" : "unsealed.wav";
+}
+
+// "sealed.wav" is only offered for audio that just verified; anything else must not look trusted.
+function setDownloadName(verdict, report) {
+  const link = $("download");
+  if (verdict === "verified") link.download = "sealed.wav";
+  else link.download = report && report.check === "absent" ? "unsealed.wav" : "unverified.wav";
 }
 
 // ---------------------------------------------------------------- UI helpers
@@ -174,11 +204,8 @@ function fillChunkSelect(chunks) {
 }
 
 function resetVerdict() {
-  const box = $("verdict");
-  box.className = "verdict neutral";
-  $("vIcon").textContent = "·";
-  $("vTitle").textContent = "Nothing verified yet";
-  $("vText").textContent = "Seal some audio, then verify it.";
+  verifyGen++; // a verification still in flight belongs to the old audio
+  setVerdictBox("neutral", "·", "Nothing verified yet", "Seal some audio, then verify it.");
   $("chunksBox").hidden = true;
   $("detailsBox").hidden = true;
 }
@@ -228,7 +255,12 @@ async function doSeal() {
   let key;
   let keyId = 0;
   if (mode === "circle") {
-    ({ key, keyId } = await circleKey($("sealPass").value));
+    try {
+      ({ key, keyId } = await circleKey($("sealPass").value));
+    } catch (error) {
+      $("sealInfo").textContent = `Could not derive the key: ${error.message}`;
+      return;
+    }
   } else {
     if (!state.seed) generateKeys();
     key = state.seed;
@@ -339,7 +371,7 @@ function contactFromSelect() {
 }
 
 function explain(report, verdict) {
-  const list = (a) => a.join(", ");
+  const list = (a) => (a.length > MAX_LISTED ? `${a.slice(0, MAX_LISTED).join(", ")} and ${a.length - MAX_LISTED} more` : a.join(", "));
   switch (verdict) {
     case "verified":
       return ["Verified", "Sealed by a key you trust, and the audio is exactly as it was sealed."];
@@ -373,13 +405,23 @@ function explain(report, verdict) {
 
 function renderChunks(report) {
   const box = $("chunksBox");
+  const list = $("chunks");
+  list.replaceChildren();
   if (!report.n_chunks) {
     box.hidden = true;
     return;
   }
   box.hidden = false;
-  const list = $("chunks");
-  list.replaceChildren();
+  if (report.n_chunks > MAX_CHUNK_ITEMS) {
+    // The count comes from the file; never build an unbounded list of elements from it.
+    if (report.authenticated) {
+      const n = report.modified_chunks.length;
+      $("chunksNote").textContent = `${report.n_chunks} chunks (too many to list). ${n === 0 ? "All are intact." : `${n} altered: ${report.modified_chunks.slice(0, MAX_LISTED).join(", ")}${n > MAX_LISTED ? ` and ${n - MAX_LISTED} more` : ""}.`}`;
+    } else {
+      $("chunksNote").textContent = "Chunk results are not shown: the seal itself is not trusted.";
+    }
+    return;
+  }
   const bad = new Set(report.modified_chunks);
   for (let i = 0; i < report.n_chunks; i++) {
     const item = document.createElement("li");
@@ -408,49 +450,85 @@ function renderChunks(report) {
     : "Chunk results are not shown as fact: the seal itself is not trusted, so the chunk list could be forged.";
 }
 
-function render(report, verdict) {
+function render(report, verdict, bytes) {
   const [title, text] = explain(report, verdict);
-  $("verdict").className = `verdict ${verdict}`;
-  $("vIcon").textContent = { verified: "✓", unsealed: "–", warning: "!", alert: "✕" }[verdict];
-  $("vTitle").textContent = title;
-  $("vText").textContent = text;
+  setVerdictBox(verdict, { verified: "✓", unsealed: "–", warning: "!", alert: "✕" }[verdict], title, text);
+  setDownloadName(verdict, report);
   renderChunks(report);
   $("detailsBox").hidden = false;
-  $("report").textContent = `${JSON.stringify(report, null, 2)}\n\nverdict: ${verdict}`;
-  $("pinEmbedded").hidden = !(report.embedded_public_key && report.check === "unknown_key");
+  let json = JSON.stringify(report, null, 2);
+  if (json.length > MAX_REPORT_CHARS) json = `${json.slice(0, MAX_REPORT_CHARS)}\n… (truncated)`;
+  $("report").textContent = `${json}\n\nverdict: ${verdict}`;
+  state.embeddedKey = report.embedded_public_key && report.check === "unknown_key" ? report.embedded_public_key : null;
+  $("pinEmbedded").hidden = !state.embeddedKey;
   try {
-    const { samples, info } = samplesOf(state.current);
-    drawWave(samples, { badChunks: report.authenticated ? report.modified_chunks : [], chunkFrames: report.chunk_frames || 0, channels: info.channels });
+    const { samples, info } = samplesOf(bytes);
+    // Boundaries and altered-chunk shading come from the seal, so only an authenticated seal may draw them.
+    drawWave(samples, {
+      badChunks: report.authenticated ? report.modified_chunks : [],
+      chunkFrames: report.authenticated ? report.chunk_frames || 0 : 0,
+      channels: info.channels,
+    });
   } catch {
     /* not drawable */
   }
 }
 
+function setVerdictBox(kind, icon, title, text) {
+  const box = $("verdict");
+  box.className = `verdict ${kind}`;
+  box.setAttribute("role", "status");
+  $("vIcon").textContent = icon;
+  $("vTitle").textContent = title;
+  $("vText").textContent = text;
+}
+
+function showProblem(title, text) {
+  setVerdictBox("alert", "✕", title, text);
+  $("verdict").setAttribute("role", "alert");
+  $("chunksBox").hidden = true;
+  $("detailsBox").hidden = true;
+  $("pinEmbedded").hidden = true;
+  state.embeddedKey = null;
+  $("download").download = "unverified.wav";
+}
+
+function updatePinInfo() {
+  const raw = $("pinned").value.trim();
+  const ok = raw === "" || /^[0-9a-fA-F]{64}$/.test(raw);
+  $("pinInfo").textContent = ok ? "" : `Not a valid public key: expected 64 hex characters (0-9, a-f), got ${raw.length}. It is being ignored.`;
+  $("pinned").setAttribute("aria-invalid", ok ? "false" : "true");
+  return ok;
+}
+
 async function runVerify() {
-  if (!state.vt || !state.current) return;
-  const trust = {};
-  const pass = $("verifyPass").value;
-  if (pass) {
-    const { key, keyId } = await circleKey(pass);
-    trust.circleKey = key;
-    trust.circleKeyId = keyId;
-  }
-  const pinned = $("pinned").value.trim().toLowerCase();
-  if (/^[0-9a-f]{64}$/.test(pinned)) trust.pinnedPublicKey = unhex(pinned);
-  let report;
+  const gen = ++verifyGen;
+  const bytes = state.current;
+  if (!state.vt || !bytes) return;
+  // Clear first: a slow or failing run must never leave the previous verdict on screen.
+  setVerdictBox("neutral", "·", "Verifying…", "Checking the seal.");
+  $("chunksBox").hidden = true;
+  $("detailsBox").hidden = true;
+  $("download").download = "unverified.wav";
   try {
-    report = state.vt.verify(state.current, trust);
+    const trust = {};
+    const pass = $("verifyPass").value;
+    if (pass) {
+      const { key, keyId } = await circleKey(pass);
+      if (gen !== verifyGen) return;
+      trust.circleKey = key;
+      trust.circleKeyId = keyId;
+    }
+    const pinned = $("pinned").value.trim().toLowerCase();
+    if (updatePinInfo() && pinned) trust.pinnedPublicKey = unhex(pinned);
+    const report = state.vt.verify(bytes, trust);
+    if (gen !== verifyGen) return;
+    if (report.chunk_frames) state.chunkFrames = report.chunk_frames;
+    render(report, state.vt.decide(report.check, contactFromSelect()), bytes);
   } catch (error) {
-    $("verdict").className = "verdict alert";
-    $("vIcon").textContent = "✕";
-    $("vTitle").textContent = "Could not read this file";
-    $("vText").textContent = error.message;
-    $("chunksBox").hidden = true;
-    $("detailsBox").hidden = true;
-    return;
+    if (gen !== verifyGen) return;
+    showProblem("Could not verify this file", error && error.message ? error.message : String(error));
   }
-  if (report.chunk_frames) state.chunkFrames = report.chunk_frames;
-  render(report, state.vt.decide(report.check, contactFromSelect()));
 }
 
 // ---------------------------------------------------------------- wiring
@@ -461,6 +539,10 @@ function wire() {
     const file = event.target.files[0];
     event.target.value = "";
     if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      $("audioInfo").textContent = tooBig(file);
+      return;
+    }
     $("audioInfo").textContent = "Decoding…";
     try {
       const { samples, truncated } = await decodeFile(file);
@@ -490,14 +572,19 @@ function wire() {
   document.querySelectorAll("[data-attack]").forEach((b) => b.addEventListener("click", () => attack(b.dataset.attack)));
   $("verifyBtn").addEventListener("click", runVerify);
   for (const id of ["verifyPass", "pinned", "contact"]) $(id).addEventListener("change", runVerify);
+  $("pinned").addEventListener("input", updatePinInfo);
   $("forgetPin").addEventListener("click", () => {
     $("pinned").value = "";
+    updatePinInfo();
+    runVerify();
+  });
+  $("forgetKeys").addEventListener("click", () => {
+    forgetKeys();
     runVerify();
   });
   $("pinEmbedded").addEventListener("click", () => {
-    const m = /"embedded_public_key": "([0-9a-f]{64})"/.exec($("report").textContent);
-    if (m) {
-      $("pinned").value = m[1];
+    if (state.embeddedKey) {
+      $("pinned").value = state.embeddedKey;
       runVerify();
     }
   });
@@ -505,7 +592,18 @@ function wire() {
     const file = event.target.files[0];
     event.target.value = "";
     if (!file) return;
-    state.current = new Uint8Array(await file.arrayBuffer());
+    verifyGen++; // drop any run still in flight for the previous file
+    if (file.size > MAX_FILE_BYTES) {
+      showProblem("File too large", tooBig(file));
+      return;
+    }
+    setVerdictBox("neutral", "·", "Reading…", file.name);
+    try {
+      state.current = new Uint8Array(await file.arrayBuffer());
+    } catch (error) {
+      showProblem("Could not read this file", error.message);
+      return;
+    }
     showAudio(state.current);
     $("verifyBtn").disabled = false;
     await runVerify();

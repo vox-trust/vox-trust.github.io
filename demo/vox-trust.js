@@ -18,7 +18,7 @@ export const unhex = (text) => {
 };
 
 /** Derives a 32-byte circle key from a passphrase with PBKDF2-HMAC-SHA-256 (WebCrypto). */
-export async function deriveCircleKey(passphrase, salt = "vox-trust/0/passphrase", iterations = 210000) {
+export async function deriveCircleKey(passphrase, salt = "vox-trust/0/passphrase", iterations = 600000) {
   const material = await crypto.subtle.importKey("raw", encoder.encode(passphrase), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
     { name: "PBKDF2", hash: "SHA-256", salt: encoder.encode(salt), iterations },
@@ -42,12 +42,21 @@ export async function loadVoxTrust(source) {
     throw new Error(`unsupported core ABI version ${x.vt_abi_version()}, expected ${ABI_VERSION}`);
   }
 
-  const put = (data) => {
+  // Copies `data` into the module and records the block in `held`, so the caller's `finally`
+  // frees it even if a later copy throws. Secret blocks (keys, seeds) are zeroed before freeing.
+  const put = (held, data, secret = false) => {
     const ptr = x.vt_alloc(data.length);
+    const block = { ptr, len: data.length, secret };
+    held.push(block);
     new Uint8Array(x.memory.buffer, ptr, data.length).set(data);
-    return { ptr, len: data.length };
+    return block;
   };
-  const release = (...blocks) => blocks.forEach((b) => b && x.vt_free(b.ptr, b.len));
+  const release = (held) => {
+    for (const b of held) {
+      if (b.secret) new Uint8Array(x.memory.buffer, b.ptr, b.len).fill(0);
+      x.vt_free(b.ptr, b.len);
+    }
+  };
   const result = () => new Uint8Array(x.memory.buffer, x.vt_result_ptr(), x.vt_result_len()).slice();
   const fail = () => {
     throw new Error(decoder.decode(result()));
@@ -77,24 +86,26 @@ export async function loadVoxTrust(source) {
     /** The recommended identifier of a 32-byte circle key (computed by the core). */
     circleKeyId(key) {
       needKey(key, "key");
-      const k = put(key);
+      const held = [];
       try {
+        const k = put(held, key, true);
         return x.vt_circle_key_id(k.ptr) >>> 0;
       } finally {
-        release(k);
+        release(held);
       }
     },
 
     /** Public key and key id (hex) for an Ed25519 seed. */
     publicKey(seed) {
       needKey(seed, "seed");
-      const s = put(seed);
+      const held = [];
       try {
+        const s = put(held, seed, true);
         if (x.vt_public_key(s.ptr) !== 0) fail();
         const parsed = JSON.parse(decoder.decode(result()));
         return { publicKey: unhex(parsed.public_key), keyId: parseInt(parsed.key_id, 16) };
       } finally {
-        release(s);
+        release(held);
       }
     },
 
@@ -106,9 +117,10 @@ export async function loadVoxTrust(source) {
       if (!(mode in MODES)) throw new Error('mode must be "circle" or "public"');
       needKey(key, "key");
       const [hi, lo] = split64(createdUnix);
-      const w = put(wav);
-      const k = put(key);
+      const held = [];
       try {
+        const w = put(held, wav);
+        const k = put(held, key, true);
         const status = x.vt_seal(
           w.ptr, w.len, MODES[mode], k.ptr, k.len,
           u32(keyId, "keyId"), hi, lo, u32(counter, "counter"), u32(chunkFrames, "chunkFrames"),
@@ -116,7 +128,7 @@ export async function loadVoxTrust(source) {
         if (status !== 0) fail();
         return result();
       } finally {
-        release(w, k);
+        release(held);
       }
     },
 
@@ -128,10 +140,11 @@ export async function loadVoxTrust(source) {
     verify(wav, { circleKey, circleKeyId = 0, pinnedPublicKey } = {}) {
       if (circleKey) needKey(circleKey, "circleKey");
       if (pinnedPublicKey) needKey(pinnedPublicKey, "pinnedPublicKey");
-      const w = put(wav);
-      const c = circleKey ? put(circleKey) : null;
-      const p = pinnedPublicKey ? put(pinnedPublicKey) : null;
+      const held = [];
       try {
+        const w = put(held, wav);
+        const c = circleKey ? put(held, circleKey, true) : null;
+        const p = pinnedPublicKey ? put(held, pinnedPublicKey) : null;
         const status = x.vt_verify(
           w.ptr, w.len, c ? c.ptr : 0, c ? c.len : 0, u32(circleKeyId, "circleKeyId"),
           p ? p.ptr : 0, p ? p.len : 0,
@@ -139,7 +152,7 @@ export async function loadVoxTrust(source) {
         if (status !== 0) fail();
         return JSON.parse(decoder.decode(result()));
       } finally {
-        release(w, c, p);
+        release(held);
       }
     },
 
