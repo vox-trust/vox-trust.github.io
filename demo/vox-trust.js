@@ -1,5 +1,5 @@
 // Vox Trust: thin JavaScript wrapper over the WebAssembly core (C ABI, ABI version 1).
-// No dependencies. Works in browsers and in Node 20+. Pre-alpha, unaudited.
+// No dependencies. Works in browsers and in Node 20+. Pre-1.0, not audited.
 //
 // All cryptography happens inside the WebAssembly module, which has no imports: it cannot
 // reach the network, the DOM or the file system. This file only moves bytes in and out.
