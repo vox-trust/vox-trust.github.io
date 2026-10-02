@@ -139,6 +139,7 @@ export default {
   "err.only_pcm16": "Only 16-bit PCM WAV files are supported.",
   "err.core_http": "Could not load the WebAssembly core: HTTP {status}.",
   "err.core_abi": "Unsupported core ABI version {got}, expected {expected}.",
+  "err.core_oom": "Not enough memory for {bytes} bytes; try a shorter file.",
   "err.core_timeout": "Loading the WebAssembly core took too long.",
   "err.no_wasm": "This browser does not support WebAssembly.",
   "err.invalid_hex": "Invalid hexadecimal text.",

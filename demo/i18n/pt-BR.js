@@ -136,6 +136,7 @@ export default {
   "err.only_pcm16": "Só há suporte para arquivos WAV PCM de 16 bits.",
   "err.core_http": "Não foi possível carregar o núcleo WebAssembly: HTTP {status}.",
   "err.core_abi": "Versão de ABI do núcleo não suportada: {got}, esperada {expected}.",
+  "err.core_oom": "Memória insuficiente para {bytes} bytes; tente um arquivo menor.",
   "err.core_timeout": "O carregamento do núcleo WebAssembly demorou demais.",
   "err.no_wasm": "Este navegador não suporta WebAssembly.",
   "err.invalid_hex": "Texto hexadecimal inválido.",

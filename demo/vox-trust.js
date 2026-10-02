@@ -49,6 +49,7 @@ export async function loadVoxTrust(source) {
   // frees it even if a later copy throws. Secret blocks (keys, seeds) are zeroed before freeing.
   const put = (held, data, secret = false) => {
     const ptr = x.vt_alloc(data.length);
+    if (ptr === 0) throw coded("core_oom", `not enough memory for ${data.length} bytes`, { bytes: data.length });
     const block = { ptr, len: data.length, secret };
     held.push(block);
     new Uint8Array(x.memory.buffer, ptr, data.length).set(data);

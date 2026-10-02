@@ -134,6 +134,7 @@ export default {
   "err.only_pcm16": "仅支持 16 位 PCM 的 WAV 文件。",
   "err.core_http": "无法加载 WebAssembly 核心：HTTP {status}。",
   "err.core_abi": "不支持的核心 ABI 版本 {got}，应为 {expected}。",
+  "err.core_oom": "内存不足，无法分配 {bytes} 字节；请尝试更短的文件。",
   "err.core_timeout": "加载 WebAssembly 核心耗时过长。",
   "err.no_wasm": "此浏览器不支持 WebAssembly。",
   "err.invalid_hex": "无效的十六进制文本。",

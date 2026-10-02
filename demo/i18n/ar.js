@@ -144,6 +144,7 @@ export default {
   "err.only_pcm16": "يدعم العرض ملفات WAV بتنسيق PCM بعمق 16 بت فقط.",
   "err.core_http": "تعذّر تحميل نواة WebAssembly: HTTP {status}.",
   "err.core_abi": "إصدار ABI للنواة غير مدعوم: {got}، والمتوقع {expected}.",
+  "err.core_oom": "لا توجد ذاكرة كافية لـ {bytes} بايت؛ جرّب ملفًا أقصر.",
   "err.core_timeout": "استغرق تحميل نواة WebAssembly وقتًا طويلًا.",
   "err.no_wasm": "هذا المتصفح لا يدعم WebAssembly.",
   "err.invalid_hex": "نص سداسي عشري غير صالح.",
