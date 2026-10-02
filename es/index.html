@@ -147,6 +147,18 @@ li{margin-bottom:8px}
 code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
 footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
 [dir=rtl] .hero,[dir=rtl] .lead{text-align:start}
+.cmp-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.cmp{border-collapse:collapse;width:100%;min-width:640px;font-size:.88rem}
+.cmp th,.cmp td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.cmp thead th{font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp th[scope=row]{text-align:start;font-weight:500}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .us{background:var(--ok-bg)}
+.cmp thead .us{color:var(--fg)}
+.cmp .y,.cmp .n,.cmp .p{display:block;font-weight:600;font-size:.82rem}
+.cmp .y{color:var(--ok)}.cmp .n{color:var(--bad)}.cmp .p{color:var(--warn)}
+.cmp small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+.big{font-size:1.15rem;font-weight:600;margin:0 0 10px}
 </style>
 </head>
 <body>
@@ -192,7 +204,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p>En lugar de preguntar "¿esta voz es falsa?", Vox Trust pregunta "¿se selló una voz real?"</p>
       <ol>
         <li><strong>Sellar.</strong> El dispositivo de quien habla añade al audio un sello firmado, en origen.</li>
-        <li><strong>Transportar.</strong> El sello puede viajar en una marca de agua de audio intercambiable, para sobrevivir a la recodificación. Un primer portador, experimental, está construido y <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>medido en público</a>: sobrevive a MP3, AAC y Opus, pero no a los códecs de llamadas telefónicas ni al ruido.</li>
+        <li><strong>Transportar.</strong> El sello puede viajar en una marca de agua de audio intercambiable, para sobrevivir a la recodificación. Un primer portador, experimental, está construido y <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>medido en público</a>: sobrevive a MP3, AAC y Opus, pero no a los códecs de llamadas telefónicas ni al ruido.</li>
         <li><strong>Verificar.</strong> Cualquiera que use el protocolo comprueba qué clave selló el audio, cuándo y qué segundos fueron alterados.</li>
         <li><strong>Decidir.</strong> Una política de confianza local convierte el resultado en uno de cuatro veredictos.</li>
       </ol>
@@ -221,6 +233,14 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p class="note">Ilustración de los veredictos de la política. La <a href="/demo/?lang=es">demo en vivo</a> ejecuta el núcleo real en Rust en tu navegador; no se sube nada.</p>
     </section>
 
+    <section aria-labelledby="compare">
+      <h2 id="compare">Cómo se compara</h2>
+      <p class="big">Los demás marcan la voz falsa. Vox Trust sella la verdadera.</p>
+      <p>Google, Meta, Microsoft y Resemble marcan el audio que generan sus propias IA. Los detectores de deepfakes estiman si una voz es sintética. Vox Trust permite que quien habla selle su propia voz, y cualquiera lo comprueba con criptografía común.</p>
+      <div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col"></th><th scope="col" class="us">Vox Trust</th><th scope="col">Google SynthID</th><th scope="col">Meta AudioSeal</th><th scope="col">Detectores de deepfakes</th><th scope="col">C2PA</th></tr></thead><tbody><tr><th scope="row">Avala una grabación humana real</th><td class="us"><span class="y">Sí</span></td><td><span class="n">No</span><small>marca salida de IA</small></td><td><span class="n">No</span><small>marca salida de IA</small></td><td><span class="p">Estima</span></td><td><span class="p">Si la app firma</span></td></tr><tr><th scope="row">Prueba ligada a la clave del propio hablante</th><td class="us"><span class="y">Sí</span></td><td><span class="n">No</span></td><td><span class="n">No</span></td><td><span class="n">No</span></td><td><span class="y">Sí</span></td></tr><tr><th scope="row">Señala los segundos alterados</th><td class="us"><span class="y">Sí</span></td><td><span class="n">No</span></td><td><span class="p">En parte</span></td><td><span class="n">No</span></td><td><span class="n">No</span><small>archivo completo</small></td></tr><tr><th scope="row">Cualquiera verifica, sin conexión</th><td class="us"><span class="y">Sí</span><small>en el navegador</small></td><td><span class="n">No</span><small>detector de Google</small></td><td><span class="y">Sí</span></td><td><span class="n">No</span></td><td><span class="y">Sí</span></td></tr><tr><th scope="row">Especificación y código abiertos</th><td class="us"><span class="y">Sí</span></td><td><span class="n">No</span><small>para audio</small></td><td><span class="y">Código</span></td><td><span class="n">No</span></td><td><span class="y">Especificación</span></td></tr><tr><th scope="row">Sobrevive a MP3, AAC, Opus</th><td class="us"><span class="p">Experimental</span><small>100 % medido</small></td><td><span class="y">Declarado</span></td><td><span class="y">Medido</span></td><td><span class="p">n/a</span></td><td><span class="n">No</span><small>metadatos eliminados</small></td></tr><tr><th scope="row">Sobrevive a llamadas</th><td class="us"><span class="n">Aún no</span><small>11 %</small></td><td><span class="p">No publicado</span></td><td><span class="n">No</span><small>0 % medido</small></td><td><span class="y">Sí</span></td><td><span class="n">No</span></td></tr><tr><th scope="row">Coste de verificar</th><td class="us"><span class="y">Milisegundos</span><small>sin modelo de IA</small></td><td><span class="p">Nube</span></td><td><span class="p">Red neuronal</span></td><td><span class="p">Nube</span></td><td><span class="y">Milisegundos</span></td></tr></tbody></table></div>
+      <p class="note">"Medido" significa ejecutado en nuestro benchmark público, con el mismo corpus y los mismos códecs; "declarado" es la cifra publicada por el proveedor. Detectores de deepfakes: por ejemplo Pindrop Pulse. La fuente de cada celda está en las <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/COMPARISON.md">notas de la comparación</a> (en inglés).</p>
+    </section>
+
     <section aria-labelledby="not">
       <h2 id="not">Lo que no es</h2>
       <ul>
@@ -239,7 +259,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
         <li>Una implementación de referencia en Rust con modo archivo (un manifiesto firmado por fragmento dentro de un WAV), política de confianza, herramienta de línea de comandos y compilación a WebAssembly. Los vectores de prueba están publicados y los contrasta una segunda implementación en Python, escrita por el mismo autor.</li>
         <li>Una <a href="/demo/?lang=es">demo en vivo</a> que verifica de verdad. Los archivos sellados solo sobreviven a copias idénticas bit a bit; los veredictos salen solo del modo archivo.</li>
         <li><strong>Sin auditar.</strong> Todavía no hay revisión independiente. No lo uses para proteger a nadie.</li>
-        <li><strong>Medido:</strong> la marca de agua experimental conserva el sello en MP3 y AAC (100 %), Opus 32 kbit/s (99 %) y Opus 24 kbit/s (93 %), sin falsas alarmas, pero falla en llamadas telefónicas (AMR-WB), con ruido y con eco. No superó nuestro propio criterio, y un sello dentro del audio puede copiarse a otro audio, así que todavía no da veredictos. <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>Resultados completos</a> (en inglés).</li>
+        <li><strong>Medido:</strong> la marca de agua experimental (stdm-2) conserva el sello en MP3, AAC, Opus 24 y 32 kbit/s y G.722 (100 %), en MP3 reenviado como Opus (98 %) y con un cambio de velocidad del 1 % (84 %), sin falsas alarmas, pero todavía falla en llamadas (AMR-WB), con ruido fuerte y con eco. Un sello dentro del audio puede copiarse a otro audio, así que todavía no da veredictos. <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>Resultados completos</a> (en inglés).</li>
       </ul>
       <p>Consulta la <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">hoja de ruta</a> (en inglés).</p>
     </section>

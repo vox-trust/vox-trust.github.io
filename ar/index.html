@@ -147,6 +147,18 @@ li{margin-bottom:8px}
 code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
 footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
 [dir=rtl] .hero,[dir=rtl] .lead{text-align:start}
+.cmp-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.cmp{border-collapse:collapse;width:100%;min-width:640px;font-size:.88rem}
+.cmp th,.cmp td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.cmp thead th{font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp th[scope=row]{text-align:start;font-weight:500}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .us{background:var(--ok-bg)}
+.cmp thead .us{color:var(--fg)}
+.cmp .y,.cmp .n,.cmp .p{display:block;font-weight:600;font-size:.82rem}
+.cmp .y{color:var(--ok)}.cmp .n{color:var(--bad)}.cmp .p{color:var(--warn)}
+.cmp small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+.big{font-size:1.15rem;font-weight:600;margin:0 0 10px}
 </style>
 </head>
 <body>
@@ -192,7 +204,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p>بدل أن نسأل «هل هذا الصوت مزيّف؟» يسأل Vox Trust: «هل خُتم صوت حقيقي؟»</p>
       <ol>
         <li><strong>الختم.</strong> يضيف جهاز المتحدث إلى الصوت ختمًا موقَّعًا عند المصدر.</li>
-        <li><strong>الحمل.</strong> يمكن أن يُحمل الختم داخل علامة مائية صوتية قابلة للاستبدال، فيصمد أمام إعادة الترميز. بُنيت ناقلة أولى تجريبية و<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>قيست علنًا</a>: تصمد أمام MP3 وAAC وOpus، لكن لا أمام ترميزات المكالمات الهاتفية ولا أمام الضوضاء.</li>
+        <li><strong>الحمل.</strong> يمكن أن يُحمل الختم داخل علامة مائية صوتية قابلة للاستبدال، فيصمد أمام إعادة الترميز. بُنيت ناقلة أولى تجريبية و<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>قيست علنًا</a>: تصمد أمام MP3 وAAC وOpus، لكن لا أمام ترميزات المكالمات الهاتفية ولا أمام الضوضاء.</li>
         <li><strong>التحقق.</strong> يستطيع أي شخص يستخدم البروتوكول أن يعرف أي مفتاح ختم الصوت، ومتى، وأي الثواني جرى تعديلها.</li>
         <li><strong>القرار.</strong> تحوّل سياسة ثقة محلية النتيجة إلى واحد من أربعة أحكام.</li>
       </ol>
@@ -221,6 +233,14 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p class="note">توضيح لأحكام السياسة. <a href="/demo/?lang=ar">العرض التجريبي</a> يشغّل نواة Rust الحقيقية داخل متصفحك، ولا يُرفع أي شيء.</p>
     </section>
 
+    <section aria-labelledby="compare">
+      <h2 id="compare">المقارنة مع البدائل</h2>
+      <p class="big">الآخرون يعلّمون الصوت المزيف. Vox Trust يختم الصوت الحقيقي.</p>
+      <p>تعلّم Google وMeta وMicrosoft وResemble الصوت الذي يولّده ذكاؤها الاصطناعي. وتقدّر كواشف التزييف العميق ما إذا كان الصوت اصطناعيًا. أما Vox Trust فيتيح للمتحدث أن يختم صوته بنفسه، ويستطيع أي شخص التحقق منه بالتشفير المعتاد.</p>
+      <div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col"></th><th scope="col" class="us">Vox Trust</th><th scope="col">Google SynthID</th><th scope="col">Meta AudioSeal</th><th scope="col">كواشف التزييف العميق</th><th scope="col">C2PA</th></tr></thead><tbody><tr><th scope="row">يضمن تسجيلًا بشريًا حقيقيًا</th><td class="us"><span class="y">نعم</span></td><td><span class="n">لا</span><small>يعلّم مخرجات الذكاء الاصطناعي</small></td><td><span class="n">لا</span><small>يعلّم مخرجات الذكاء الاصطناعي</small></td><td><span class="p">يقدّر</span></td><td><span class="p">إذا وقّع التطبيق</span></td></tr><tr><th scope="row">دليل مرتبط بمفتاح المتحدث نفسه</th><td class="us"><span class="y">نعم</span></td><td><span class="n">لا</span></td><td><span class="n">لا</span></td><td><span class="n">لا</span></td><td><span class="y">نعم</span></td></tr><tr><th scope="row">يحدد الثواني التي عُدّلت</th><td class="us"><span class="y">نعم</span></td><td><span class="n">لا</span></td><td><span class="p">جزئيًا</span></td><td><span class="n">لا</span></td><td><span class="n">لا</span><small>الملف كله</small></td></tr><tr><th scope="row">يستطيع أي شخص التحقق دون اتصال</th><td class="us"><span class="y">نعم</span><small>في المتصفح</small></td><td><span class="n">لا</span><small>كاشف Google</small></td><td><span class="y">نعم</span></td><td><span class="n">لا</span></td><td><span class="y">نعم</span></td></tr><tr><th scope="row">مواصفة وشيفرة مفتوحتان</th><td class="us"><span class="y">نعم</span></td><td><span class="n">لا</span><small>للصوت</small></td><td><span class="y">الشيفرة</span></td><td><span class="n">لا</span></td><td><span class="y">المواصفة</span></td></tr><tr><th scope="row">يصمد أمام MP3 وAAC وOpus</th><td class="us"><span class="p">تجريبي</span><small>100 % مقيس</small></td><td><span class="y">مُعلن</span></td><td><span class="y">مقيس</span></td><td><span class="p">لا ينطبق</span></td><td><span class="n">لا</span><small>تُحذف البيانات الوصفية</small></td></tr><tr><th scope="row">يصمد أمام المكالمات الهاتفية</th><td class="us"><span class="n">ليس بعد</span><small>11 %</small></td><td><span class="p">غير منشور</span></td><td><span class="n">لا</span><small>0 % مقيس</small></td><td><span class="y">نعم</span></td><td><span class="n">لا</span></td></tr><tr><th scope="row">كلفة التحقق</th><td class="us"><span class="y">أجزاء من الثانية</span><small>دون نموذج ذكاء اصطناعي</small></td><td><span class="p">سحابة</span></td><td><span class="p">شبكة عصبية</span></td><td><span class="p">سحابة</span></td><td><span class="y">أجزاء من الثانية</span></td></tr></tbody></table></div>
+      <p class="note">"مقيس" يعني أنه شُغّل على اختبارنا المعياري العلني بالمدوّنة الصوتية والترميزات نفسها؛ و"مُعلن" هو الرقم الذي نشره المورّد. كواشف التزييف العميق: مثل Pindrop Pulse. مصدر كل خانة في <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/COMPARISON.md">ملاحظات المقارنة</a> (بالإنجليزية).</p>
+    </section>
+
     <section aria-labelledby="not">
       <h2 id="not">ما ليس عليه</h2>
       <ul>
@@ -239,7 +259,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
         <li>تنفيذ مرجعي بلغة Rust يتضمن وضع الملفات (بيان موقَّع لكل مقطع داخل ملف WAV)، وسياسة الثقة، وأداة سطر أوامر، ونسخة WebAssembly. متجهات الاختبار منشورة ويتحقق منها تنفيذ ثانٍ بلغة Python كتبه المؤلف نفسه.</li>
         <li><a href="/demo/?lang=ar">عرض تجريبي</a> يتحقق فعلًا. تصمد الملفات المختومة أمام النسخ المطابقة بت بت فقط؛ والأحكام تصدر عن وضع الملفات وحده.</li>
         <li><strong>دون تدقيق أمني.</strong> لا توجد مراجعة مستقلة حتى الآن. لا تستخدمه لحماية أي شخص.</li>
-        <li><strong>ما قيس:</strong> تحافظ العلامة المائية التجريبية على الختم عبر MP3 وAAC (100%) وOpus بمعدل 32 كيلوبت/ث (99%) و24 كيلوبت/ث (93%) دون إنذارات كاذبة، لكنها تفشل في المكالمات الهاتفية (AMR-WB) ومع الضوضاء والصدى. لم تجتز معيارنا نحن، ويمكن نسخ الختم المضمّن في الصوت إلى صوت آخر، لذلك لا تُصدر أحكامًا بعد. <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>النتائج الكاملة</a> (بالإنجليزية).</li>
+        <li><strong>ما قيس:</strong> تحافظ العلامة المائية التجريبية (stdm-2) على الختم عبر MP3 وAAC وOpus بمعدل 24 و32 كيلوبت/ث وG.722 (100%)، وعبر MP3 أعيد إرساله بصيغة Opus (98%)، ومع تغيير السرعة بنسبة 1% (84%)، دون إنذارات كاذبة، لكنها ما زالت تفشل في المكالمات الهاتفية (AMR-WB) ومع الضوضاء القوية والصدى. يمكن نسخ الختم المضمّن في الصوت إلى صوت آخر، لذلك لا تُصدر أحكامًا بعد. <a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>النتائج الكاملة</a> (بالإنجليزية).</li>
       </ul>
       <p>انظر <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">خارطة الطريق</a> (بالإنجليزية).</p>
     </section>

@@ -147,6 +147,18 @@ li{margin-bottom:8px}
 code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
 footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
 [dir=rtl] .hero,[dir=rtl] .lead{text-align:start}
+.cmp-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.cmp{border-collapse:collapse;width:100%;min-width:640px;font-size:.88rem}
+.cmp th,.cmp td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.cmp thead th{font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp th[scope=row]{text-align:start;font-weight:500}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .us{background:var(--ok-bg)}
+.cmp thead .us{color:var(--fg)}
+.cmp .y,.cmp .n,.cmp .p{display:block;font-weight:600;font-size:.82rem}
+.cmp .y{color:var(--ok)}.cmp .n{color:var(--bad)}.cmp .p{color:var(--warn)}
+.cmp small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+.big{font-size:1.15rem;font-weight:600;margin:0 0 10px}
 </style>
 </head>
 <body>
@@ -192,7 +204,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p>Vox Trust 不问“这段声音是假的吗?”,而是问“真实的声音有没有被签章?”</p>
       <ol>
         <li><strong>签章。</strong>说话者的设备在源头为音频加上带数字签名的签章。</li>
-        <li><strong>携带。</strong>签章可以藏在可插拔的音频水印中，以便在重新编码后仍能留存。第一个实验性载体已经实现，并已<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>公开实测</a>:它能经受 MP3、AAC 和 Opus，但无法经受电话通话编解码器和噪声。</li>
+        <li><strong>携带。</strong>签章可以藏在可插拔的音频水印中，以便在重新编码后仍能留存。第一个实验性载体已经实现，并已<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>公开实测</a>:它能经受 MP3、AAC 和 Opus，但无法经受电话通话编解码器和噪声。</li>
         <li><strong>验证。</strong>任何使用该协议的人都可以查看是哪把密钥、在何时为音频签章，以及哪几秒被改动过。</li>
         <li><strong>判定。</strong>本地信任策略会把结果归为四种裁决之一。</li>
       </ol>
@@ -221,6 +233,14 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
       <p class="note">以上为策略裁决的示意。<a href="/demo/?lang=zh-Hans">在线演示</a>在你的浏览器中运行真实的 Rust 核心，不会上传任何内容。</p>
     </section>
 
+    <section aria-labelledby="compare">
+      <h2 id="compare">横向对比</h2>
+      <p class="big">别人给伪造的声音打标记，Vox Trust 为真实的声音签章。</p>
+      <p>Google、Meta、Microsoft 和 Resemble 给自家 AI 生成的音频打标记。深度伪造检测器估计声音是否为合成。Vox Trust 让说话者为自己的声音签章，任何人都能用普通的密码学方法核验。</p>
+      <div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col"></th><th scope="col" class="us">Vox Trust</th><th scope="col">Google SynthID</th><th scope="col">Meta AudioSeal</th><th scope="col">深度伪造检测器</th><th scope="col">C2PA</th></tr></thead><tbody><tr><th scope="row">为真人录音作保</th><td class="us"><span class="y">是</span></td><td><span class="n">否</span><small>标记 AI 输出</small></td><td><span class="n">否</span><small>标记 AI 输出</small></td><td><span class="p">估计</span></td><td><span class="p">若应用签名</span></td></tr><tr><th scope="row">证明与说话者本人的密钥绑定</th><td class="us"><span class="y">是</span></td><td><span class="n">否</span></td><td><span class="n">否</span></td><td><span class="n">否</span></td><td><span class="y">是</span></td></tr><tr><th scope="row">指出被改动的秒数</th><td class="us"><span class="y">是</span></td><td><span class="n">否</span></td><td><span class="p">部分</span></td><td><span class="n">否</span></td><td><span class="n">否</span><small>仅整个文件</small></td></tr><tr><th scope="row">任何人都能离线验证</th><td class="us"><span class="y">是</span><small>浏览器内</small></td><td><span class="n">否</span><small>需 Google 检测器</small></td><td><span class="y">是</span></td><td><span class="n">否</span></td><td><span class="y">是</span></td></tr><tr><th scope="row">规范与代码开放</th><td class="us"><span class="y">是</span></td><td><span class="n">否</span><small>音频未开放</small></td><td><span class="y">代码</span></td><td><span class="n">否</span></td><td><span class="y">规范</span></td></tr><tr><th scope="row">经受 MP3、AAC、Opus</th><td class="us"><span class="p">实验性</span><small>实测 100 %</small></td><td><span class="y">官方声称</span></td><td><span class="y">实测</span></td><td><span class="p">不适用</span></td><td><span class="n">否</span><small>元数据被剥离</small></td></tr><tr><th scope="row">经受电话通话</th><td class="us"><span class="n">尚不能</span><small>11 %</small></td><td><span class="p">未公布</span></td><td><span class="n">否</span><small>实测 0 %</small></td><td><span class="y">是</span></td><td><span class="n">否</span></td></tr><tr><th scope="row">验证成本</th><td class="us"><span class="y">毫秒级</span><small>无需 AI 模型</small></td><td><span class="p">云服务</span></td><td><span class="p">神经网络</span></td><td><span class="p">云服务</span></td><td><span class="y">毫秒级</span></td></tr></tbody></table></div>
+      <p class="note">“实测”指在我们的公开基准测试中以相同语料和编解码器运行；“官方声称”指厂商公布的数据。深度伪造检测器：例如 Pindrop Pulse。每个单元格的来源见<a href="https://github.com/vox-trust/vox-trust/blob/main/docs/COMPARISON.md">对比说明</a>（英文）。</p>
+    </section>
+
     <section aria-labelledby="not">
       <h2 id="not">它不是什么</h2>
       <ul>
@@ -239,7 +259,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
         <li>Rust 参考实现，包含文件模式（在 WAV 文件内嵌入按分段签名的清单）、信任策略、命令行工具和 WebAssembly 构建。测试向量已公开，并由同一作者编写的 Python 实现交叉验证。</li>
         <li>一个真正能完成验证的<a href="/demo/?lang=zh-Hans">在线演示</a>。签章过的文件只在逐比特一致的副本中有效；验证结论目前只来自文件模式。</li>
         <li><strong>未经审计。</strong>目前没有独立评审，请勿用它来保护任何人。</li>
-        <li><strong>实测结果:</strong>实验性水印在 MP3 和 AAC(100%)、Opus 32 kbit/s(99%)和 Opus 24 kbit/s(93%)中都能保留签章，且没有误报；但在电话通话(AMR-WB)、噪声和回声下会失效。它没有通过我们自己设定的标准，而且音频内的签章可以被复制到其他音频中，因此目前不给出验证结论。<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-01-stdm-1/README.md'>完整结果</a>（英文）。</li>
+        <li><strong>实测结果：</strong>实验性水印（stdm-2）在 MP3、AAC、Opus 24 和 32 kbit/s 以及 G.722 中都能保留签章（100%），MP3 再转为 Opus 转发后为 98%，速度变化 1% 时为 84%，且没有误报；但在电话通话（AMR-WB）、强噪声和回声下仍会失效。音频内的签章可以被复制到其他音频中，因此目前不给出验证结论。<a href='https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-stdm-2/README.md'>完整结果</a>（英文）。</li>
       </ul>
       <p>参见<a href="https://github.com/vox-trust/vox-trust/blob/main/docs/ROADMAP.md">路线图</a>（英文）。</p>
     </section>
