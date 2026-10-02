@@ -16,7 +16,7 @@ export default {
 
   "scope.summary": "Qué es esta demo y qué no es",
   "scope.is": "**Es** el código real de sello, firma, política de confianza y localización de manipulaciones, ejecutándose como WebAssembly. El mismo código supera los vectores de prueba publicados.",
-  "scope.limit": "**El modo archivo solo sobrevive a copias idénticas bit a bit.** Convertir a MP3, remuestrear o volver a grabar cambia todas las muestras, así que el sello informa que el audio fue modificado. Resistir eso es tarea de la portadora de marca de agua de audio, que **todavía no está construida**. Prueba el botón «con pérdida» para verlo.",
+  "scope.limit": "**El modo archivo solo sobrevive a copias idénticas bit a bit.** Convertir a MP3, remuestrear o volver a grabar cambia todas las muestras, así que el sello informa que el audio fue modificado. Resistir eso es tarea de la portadora de marca de agua de audio, que es **experimental**: sobrevive a MP3, AAC y Opus, pero no a las llamadas, y todavía no da veredictos. Prueba el botón «con pérdida» para verlo.",
   "scope.meta": "Solo se autentican el formato del audio y las muestras, no el resto de los metadatos del archivo.",
   "scope.audit": "Está en fase previa a la 1.0 y **no ha sido auditada**. No la uses todavía para proteger a nadie.",
 

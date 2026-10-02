@@ -19,7 +19,7 @@ export default {
 
   "scope.summary": "What this demo is, and what it is not",
   "scope.is": "**It is** the real seal, signature, trust policy and tamper-localisation code, running as WebAssembly. The same code passes the published test vectors.",
-  "scope.limit": "**File mode only survives bit-exact copies.** Converting to MP3, resampling or re-recording changes every sample, so the seal reports the audio as modified. Surviving that is the job of the audio watermark carrier, which is **not built yet**. Try the \"lossy\" button to see exactly this.",
+  "scope.limit": "**File mode only survives bit-exact copies.** Converting to MP3, resampling or re-recording changes every sample, so the seal reports the audio as modified. Surviving that is the job of the audio watermark carrier, which is **experimental**: it survives MP3, AAC and Opus but not phone calls, and gives no verdicts yet. Try the \"lossy\" button to see exactly this.",
   "scope.meta": "Only the audio format and the samples are authenticated, not other metadata in the file.",
   "scope.audit": "It is pre-1.0 and **has not been audited**. Do not use it to protect anyone yet.",
 
