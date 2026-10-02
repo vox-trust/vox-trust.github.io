@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vox Trust vs SynthID, AudioSeal and deepfake detectors</title>
+<meta name="description" content="Vox Trust compared with Google SynthID, Meta AudioSeal, WavMark, Resemble PerTh, deepfake detectors and C2PA: features, measured robustness and sources.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://vox-trust.github.io/compare/">
+<link rel="alternate" hreflang="en" href="https://vox-trust.github.io/compare/">
+<link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/comparar/">
+<link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/compare/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Vox Trust">
+<meta property="og:title" content="Vox Trust vs SynthID, AudioSeal and deepfake detectors">
+<meta property="og:description" content="Vox Trust compared with Google SynthID, Meta AudioSeal, WavMark, Resemble PerTh, deepfake detectors and C2PA: features, measured robustness and sources.">
+<meta property="og:url" content="https://vox-trust.github.io/compare/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://vox-trust.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vox Trust vs SynthID, AudioSeal and deepfake detectors">
+<meta name="twitter:description" content="Vox Trust compared with Google SynthID, Meta AudioSeal, WavMark, Resemble PerTh, deepfake detectors and C2PA: features, measured robustness and sources.">
+<meta name="twitter:image" content="https://vox-trust.github.io/og.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Article",
+   "@id": "https://vox-trust.github.io/compare/#article",
+   "headline": "Vox Trust vs Google SynthID, Meta AudioSeal and deepfake detectors",
+   "description": "Vox Trust compared with Google SynthID, Meta AudioSeal, WavMark, Resemble PerTh, deepfake detectors and C2PA: features, measured robustness and sources.",
+   "inLanguage": "en",
+   "url": "https://vox-trust.github.io/compare/",
+   "datePublished": "2026-10-02",
+   "dateModified": "2026-10-02",
+   "author": {
+    "@type": "Person",
+    "name": "Roger Oliveira",
+    "url": "https://www.linkedin.com/in/rogeroliveira/"
+   },
+   "publisher": {
+    "@type": "Person",
+    "name": "Roger Oliveira",
+    "url": "https://www.linkedin.com/in/rogeroliveira/"
+   },
+   "image": "https://vox-trust.github.io/og.png",
+   "mainEntityOfPage": "https://vox-trust.github.io/compare/",
+   "isPartOf": {
+    "@id": "https://vox-trust.github.io/#site"
+   },
+   "about": {
+    "@id": "https://vox-trust.github.io/#code"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Vox Trust",
+     "item": "https://vox-trust.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Comparison",
+     "item": "https://vox-trust.github.io/compare/"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is Vox Trust an alternative to Google SynthID?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It solves a different problem. SynthID marks audio made by Google's AI so it can be recognised as synthetic. Vox Trust lets a real person seal their own recordings, so a receiver can check they are genuine and unaltered. The two can coexist."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does Vox Trust detect deepfakes?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. It does not guess whether a voice is fake. It proves that a recording was sealed by a known key and shows which seconds changed. Unsealed audio is neutral, not \"fake\"."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How is it different from AudioSeal or WavMark?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Those are watermarks: they hide a short message in audio. Vox Trust is a protocol on top: a cryptographic seal, a trust policy and exact tamper localisation. A watermark like AudioSeal or WavMark could carry the Vox Trust seal; we measured both as candidates."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Vox Trust open source?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes: the specification, the Rust implementation, the test vectors and the benchmark, including the conditions where it still fails."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+<style>
+:root{
+  --bg:#fbfbf9;--fg:#15181c;--muted:#566070;--card:#ffffff;--border:#e1e4e8;
+  --accent:#1f4fd8;--accent-fg:#ffffff;--control-border:#7d8794;--code:#f0f1f3;
+  --ok:#0f6b45;--ok-bg:#e4f3ec;--warn:#855400;--warn-bg:#fcf0d4;--bad:#a0222a;--bad-bg:#fae6e7;--neutral-bg:#eceef1;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1013;--fg:#e8eaed;--muted:#a3abb6;--card:#151921;--border:#272d38;
+  --accent:#86a9ff;--accent-fg:#0b1020;--control-border:#6b7584;--code:#1b2029;
+  --ok:#62d6a3;--ok-bg:#112419;--warn:#f1c35c;--warn-bg:#2a2410;--bad:#ff8c91;--bad-bg:#2c1416;--neutral-bg:#1c212a;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body:lang(zh-Hans){font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC","WenQuanYi Micro Hei",sans-serif;line-height:1.75}
+body:lang(ar){font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Arabic","Geeza Pro","Dubai",Tahoma,Arial,sans-serif;line-height:1.85}
+a{color:var(--accent)}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;inset-inline-start:12px;top:-60px;background:var(--accent);color:var(--accent-fg);padding:8px 14px;border-radius:8px;z-index:10;text-decoration:none;font-weight:600}
+.skip:focus{top:12px}
+.wrap{max-width:46rem;margin:0 auto;padding:0 16px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;padding:18px 0 6px;font-size:.95rem;flex-wrap:wrap}
+header.top .brand{font-weight:700;letter-spacing:.01em;color:var(--fg);text-decoration:none}
+header.top nav{display:flex;gap:0 8px;flex-wrap:wrap}
+header.top a,.langs a{display:inline-block;min-height:24px;line-height:24px;padding:4px 6px}
+.langs{padding:0 0 4px;font-size:.9rem}
+.langs ul{list-style:none;margin:0;padding:0;display:flex;gap:0 8px;flex-wrap:wrap}
+.langs li{margin:0}
+.langs a[aria-current]{color:var(--fg);font-weight:700;text-decoration:none;border-bottom:2px solid var(--accent)}
+.hero{padding:32px 0 24px}
+.chip{display:inline-block;font-size:.82rem;padding:4px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);background:var(--card)}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.08;margin:18px 0 8px;letter-spacing:-.02em}
+.tag{font-size:clamp(1.25rem,4vw,1.6rem);line-height:1.3;margin:0 0 16px;font-weight:600}
+.lead{color:var(--muted);margin:0 0 24px;max-width:38rem}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 18px;border-radius:8px;text-decoration:none;font-weight:600;border:1px solid var(--control-border);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+section{padding:28px 0;border-top:1px solid var(--border)}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px;letter-spacing:-.01em}
+p{margin:0 0 14px}
+ol,ul{margin:0 0 14px;padding-inline-start:1.3rem}
+li{margin-bottom:8px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin:16px 0}
+@media (max-width:520px){.cards{grid-template-columns:1fr}}
+.card{border-radius:10px;padding:16px;border:1px solid var(--border);background:var(--card)}
+.card h3{margin:0 0 6px;font-size:1.05rem}
+.card p{margin:0;font-size:.95rem}
+.card{border-inline-start:4px solid var(--muted)}
+.card.ok{background:var(--ok-bg);border-inline-start-color:var(--ok)}
+.card.neutral{background:var(--neutral-bg);border-inline-start-color:var(--muted)}
+.card.warn{background:var(--warn-bg);border-inline-start-color:var(--warn)}
+.card.bad{background:var(--bad-bg);border-inline-start-color:var(--bad)}
+.note{font-size:.88rem;color:var(--muted)}
+code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
+footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
+[dir=rtl] .hero,[dir=rtl] .lead{text-align:start}
+.cmp-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.cmp{border-collapse:collapse;width:100%;min-width:640px;font-size:.88rem}
+.cmp th,.cmp td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.cmp thead th{font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp th[scope=row]{text-align:start;font-weight:500}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .us{background:var(--ok-bg)}
+.cmp thead .us{color:var(--fg)}
+.cmp .y,.cmp .n,.cmp .p{display:block;font-weight:600;font-size:.82rem}
+.cmp .y{color:var(--ok)}.cmp .n{color:var(--bad)}.cmp .p{color:var(--warn)}
+.cmp small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+.big{font-size:1.15rem;font-weight:600;margin:0 0 10px}
+.crumb{font-size:.88rem;color:var(--muted);margin:18px 0 0}.crumb a{color:var(--muted)}
+.steps li{margin-bottom:10px}
+.cta{margin:18px 0 6px}
+.faq h3{font-size:1.05rem;margin:18px 0 6px}
+.src{font-size:.88rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">Vox Trust</a>
+    <nav aria-label="Main">
+      <a href="/demo/?lang=en">Demo</a>
+      <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
+    </nav>
+  </header>
+  <nav class="langs" aria-label="Language"><ul><li><a href="/compare/" hreflang="en" lang="en" aria-current="page">English</a></li><li><a href="/pt/comparar/" hreflang="pt-BR" lang="pt-BR">Português</a></li></ul></nav>
+  <main id="main">
+    <p class="crumb"><a href="/">Vox Trust</a> › Comparison</p>
+    <div class="hero" style="padding-top:8px">
+      <h1>Vox Trust vs Google SynthID, Meta AudioSeal and deepfake detectors</h1>
+    </div>
+    <p class="lead">Google SynthID, Meta AudioSeal, Microsoft and Resemble watermark audio their own AI generates, so it can be recognised later. Deepfake detectors estimate whether a voice is synthetic. Vox Trust does the opposite: a real speaker seals their own voice, and anyone verifies it with ordinary cryptography.</p>
+    <section aria-labelledby="features">
+      <h2 id="features">Features side by side</h2>
+      <div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col"></th><th scope="col" class="us">Vox Trust</th><th scope="col">Google SynthID</th><th scope="col">Meta AudioSeal</th><th scope="col">Deepfake detectors</th><th scope="col">C2PA</th></tr></thead><tbody><tr><th scope="row">Vouches for a real human recording</th><td class="us"><span class="y">Yes</span></td><td><span class="n">No</span><small>marks AI output</small></td><td><span class="n">No</span><small>marks AI output</small></td><td><span class="p">Estimates</span></td><td><span class="p">If the app signs</span></td></tr><tr><th scope="row">Proof bound to the speaker's own key</th><td class="us"><span class="y">Yes</span></td><td><span class="n">No</span></td><td><span class="n">No</span></td><td><span class="n">No</span></td><td><span class="y">Yes</span></td></tr><tr><th scope="row">Points to the seconds that were altered</th><td class="us"><span class="y">Yes</span></td><td><span class="n">No</span></td><td><span class="p">Partly</span></td><td><span class="n">No</span></td><td><span class="n">No</span><small>whole file</small></td></tr><tr><th scope="row">Anyone can verify, offline</th><td class="us"><span class="y">Yes</span><small>in the browser</small></td><td><span class="n">No</span><small>Google's detector</small></td><td><span class="y">Yes</span></td><td><span class="n">No</span></td><td><span class="y">Yes</span></td></tr><tr><th scope="row">Open specification and code</th><td class="us"><span class="y">Yes</span></td><td><span class="n">No</span><small>for audio</small></td><td><span class="y">Code</span></td><td><span class="n">No</span></td><td><span class="y">Specification</span></td></tr><tr><th scope="row">Survives MP3, AAC, Opus</th><td class="us"><span class="p">Experimental</span><small>100 % measured</small></td><td><span class="y">Claimed</span></td><td><span class="y">Measured</span></td><td><span class="p">n/a</span></td><td><span class="n">No</span><small>metadata stripped</small></td></tr><tr><th scope="row">Survives phone calls</th><td class="us"><span class="n">Not yet</span><small>11 %</small></td><td><span class="p">Not published</span></td><td><span class="n">No</span><small>0 % measured</small></td><td><span class="y">Yes</span></td><td><span class="n">No</span></td></tr><tr><th scope="row">Cost to verify</th><td class="us"><span class="y">Milliseconds</span><small>no AI model</small></td><td><span class="p">Cloud</span></td><td><span class="p">Neural network</span></td><td><span class="p">Cloud</span></td><td><span class="y">Milliseconds</span></td></tr></tbody></table></div>
+      <p class="note">"Measured" means run on our public benchmark with the same corpus and codecs; "claimed" is the vendor's published figure. Every cell is sourced in the <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/COMPARISON.md">comparison notes</a>.</p>
+    </section>
+    <section aria-labelledby="measured">
+      <h2 id="measured">Watermarks measured on the same test</h2>
+      <p>13 recordings in 10 languages, the same real codecs and quality metrics. AudioSeal and WavMark carried one 16-bit message repeated over the whole recording, an easier task than a 102-bit seal every 9.6 s, so their numbers are an upper bound.</p>
+      <div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col">Condition</th><th scope="col" class="us">Vox Trust stdm-2</th><th scope="col">Meta AudioSeal</th><th scope="col">WavMark</th></tr></thead><tbody>
+      <tr><th scope="row">MP3, AAC, Opus 24 kbit/s</th><td class="us">100 %</td><td>100 %</td><td>100 % (Opus)</td></tr>
+      <tr><th scope="row">G.722 (VoIP)</th><td class="us">100 %</td><td>0 %</td><td>not run</td></tr>
+      <tr><th scope="row">Start of the audio trimmed</th><td class="us">100 %</td><td>8 %</td><td>not run</td></tr>
+      <tr><th scope="row">1 % speed change</th><td class="us">84 %</td><td>62 %</td><td>100 %</td></tr>
+      <tr><th scope="row">Noise at 30 dB</th><td class="us">51 %</td><td>100 %</td><td>not run</td></tr>
+      <tr><th scope="row">Echo</th><td class="us">0 %</td><td>100 %</td><td>100 %</td></tr>
+      <tr><th scope="row">Noise reduction</th><td class="us">7 %</td><td>0 %</td><td>100 %</td></tr>
+      <tr><th scope="row">Phone call (AMR-WB 12.65 kbit/s)</th><td class="us">11 %</td><td>0 %</td><td>31 %</td></tr>
+      <tr><th scope="row">False alarms on unmarked audio</th><td class="us">0</td><td>0</td><td>0</td></tr>
+      <tr><th scope="row">Cost to verify</th><td class="us">milliseconds</td><td>neural network</td><td>minutes on CPU</td></tr>
+      </tbody></table></div>
+      <p class="note">Full data and how to reproduce: <a href="https://github.com/vox-trust/vox-trust/blob/main/bench/results/2026-10-02-neural-baselines/README.md">benchmark results</a>. Google SynthID could not be measured: its audio detector is not public.</p>
+      <p class="cta"><a class="btn primary" href="/demo/?lang=en">Try the demo</a> <a class="btn" href="/voice-cloning-scam/">Protect yourself from voice-cloning scams</a></p>
+    </section>
+
+    <section class="faq" aria-labelledby="faq">
+      <h2 id="faq">Frequently asked questions</h2>
+<h3>Is Vox Trust an alternative to Google SynthID?</h3>
+<p>It solves a different problem. SynthID marks audio made by Google's AI so it can be recognised as synthetic. Vox Trust lets a real person seal their own recordings, so a receiver can check they are genuine and unaltered. The two can coexist.</p>
+<h3>Does Vox Trust detect deepfakes?</h3>
+<p>No. It does not guess whether a voice is fake. It proves that a recording was sealed by a known key and shows which seconds changed. Unsealed audio is neutral, not "fake".</p>
+<h3>How is it different from AudioSeal or WavMark?</h3>
+<p>Those are watermarks: they hide a short message in audio. Vox Trust is a protocol on top: a cryptographic seal, a trust policy and exact tamper localisation. A watermark like AudioSeal or WavMark could carry the Vox Trust seal; we measured both as candidates.</p>
+<h3>Is Vox Trust open source?</h3>
+<p>Yes: the specification, the Rust implementation, the test vectors and the benchmark, including the conditions where it still fails.</p>
+    </section>
+  </main>
+  <footer>
+    <p>Code under <a href="https://github.com/vox-trust/vox-trust/blob/main/LICENSE">Apache-2.0</a>. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me">Roger Oliveira</a> and Vox Trust contributors. This site uses no cookies and loads nothing from third parties.</p>
+  </footer>
+</div>
+</body>
+</html>

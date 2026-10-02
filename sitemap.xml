@@ -53,4 +53,32 @@
   <url>
     <loc>https://vox-trust.github.io/demo/</loc>
   </url>
+  <url>
+    <loc>https://vox-trust.github.io/voice-cloning-scam/</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vox-trust.github.io/voice-cloning-scam/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/golpe-voz-clonada/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/voice-cloning-scam/"/>
+  </url>
+  <url>
+    <loc>https://vox-trust.github.io/pt/golpe-voz-clonada/</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vox-trust.github.io/voice-cloning-scam/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/golpe-voz-clonada/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/voice-cloning-scam/"/>
+  </url>
+  <url>
+    <loc>https://vox-trust.github.io/compare/</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vox-trust.github.io/compare/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/comparar/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/compare/"/>
+  </url>
+  <url>
+    <loc>https://vox-trust.github.io/pt/comparar/</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vox-trust.github.io/compare/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/comparar/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/compare/"/>
+  </url>
 </urlset>

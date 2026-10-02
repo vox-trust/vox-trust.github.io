@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice-cloning scams: how to protect your family</title>
+<meta name="description" content="How AI voice-cloning scams work, the warning signs, what to do in the moment (call back, family code word) and how sealing real voices helps.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://vox-trust.github.io/voice-cloning-scam/">
+<link rel="alternate" hreflang="en" href="https://vox-trust.github.io/voice-cloning-scam/">
+<link rel="alternate" hreflang="pt-BR" href="https://vox-trust.github.io/pt/golpe-voz-clonada/">
+<link rel="alternate" hreflang="x-default" href="https://vox-trust.github.io/voice-cloning-scam/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Vox Trust">
+<meta property="og:title" content="Voice-cloning scams: how to protect your family">
+<meta property="og:description" content="How AI voice-cloning scams work, the warning signs, what to do in the moment (call back, family code word) and how sealing real voices helps.">
+<meta property="og:url" content="https://vox-trust.github.io/voice-cloning-scam/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://vox-trust.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Voice-cloning scams: how to protect your family">
+<meta name="twitter:description" content="How AI voice-cloning scams work, the warning signs, what to do in the moment (call back, family code word) and how sealing real voices helps.">
+<meta name="twitter:image" content="https://vox-trust.github.io/og.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Article",
+   "@id": "https://vox-trust.github.io/voice-cloning-scam/#article",
+   "headline": "Voice-cloning scams: how they work and how to protect yourself",
+   "description": "How AI voice-cloning scams work, the warning signs, what to do in the moment (call back, family code word) and how sealing real voices helps.",
+   "inLanguage": "en",
+   "url": "https://vox-trust.github.io/voice-cloning-scam/",
+   "datePublished": "2026-10-02",
+   "dateModified": "2026-10-02",
+   "author": {
+    "@type": "Person",
+    "name": "Roger Oliveira",
+    "url": "https://www.linkedin.com/in/rogeroliveira/"
+   },
+   "publisher": {
+    "@type": "Person",
+    "name": "Roger Oliveira",
+    "url": "https://www.linkedin.com/in/rogeroliveira/"
+   },
+   "image": "https://vox-trust.github.io/og.png",
+   "mainEntityOfPage": "https://vox-trust.github.io/voice-cloning-scam/",
+   "isPartOf": {
+    "@id": "https://vox-trust.github.io/#site"
+   },
+   "about": {
+    "@id": "https://vox-trust.github.io/#code"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Vox Trust",
+     "item": "https://vox-trust.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Voice-cloning scams",
+     "item": "https://vox-trust.github.io/voice-cloning-scam/"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Can you recognise a cloned voice by ear?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not reliably. Current tools copy timbre and intonation very well. The FTC puts it simply: do not trust the voice, confirm through another channel."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How much audio does a scammer need?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A few seconds of speech is enough for many tools, and public videos and voice notes on social media usually provide it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does a family code word really work?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. It is simple and defeats the imitation, because the AI copies the voice, not what only your family knows. Choose an odd word that never appears online."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does Vox Trust stop the scam?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not on its own yet. It proves that an audio file came from a known key and was not altered, which works today for files sent without re-compression. For voice notes and calls, the part that survives re-compression is still experimental."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Vox Trust free?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. It is open source (Apache-2.0), with a public specification and a demo that runs in the browser without sending anything to a server."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+<style>
+:root{
+  --bg:#fbfbf9;--fg:#15181c;--muted:#566070;--card:#ffffff;--border:#e1e4e8;
+  --accent:#1f4fd8;--accent-fg:#ffffff;--control-border:#7d8794;--code:#f0f1f3;
+  --ok:#0f6b45;--ok-bg:#e4f3ec;--warn:#855400;--warn-bg:#fcf0d4;--bad:#a0222a;--bad-bg:#fae6e7;--neutral-bg:#eceef1;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1013;--fg:#e8eaed;--muted:#a3abb6;--card:#151921;--border:#272d38;
+  --accent:#86a9ff;--accent-fg:#0b1020;--control-border:#6b7584;--code:#1b2029;
+  --ok:#62d6a3;--ok-bg:#112419;--warn:#f1c35c;--warn-bg:#2a2410;--bad:#ff8c91;--bad-bg:#2c1416;--neutral-bg:#1c212a;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body:lang(zh-Hans){font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC","WenQuanYi Micro Hei",sans-serif;line-height:1.75}
+body:lang(ar){font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Arabic","Geeza Pro","Dubai",Tahoma,Arial,sans-serif;line-height:1.85}
+a{color:var(--accent)}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;inset-inline-start:12px;top:-60px;background:var(--accent);color:var(--accent-fg);padding:8px 14px;border-radius:8px;z-index:10;text-decoration:none;font-weight:600}
+.skip:focus{top:12px}
+.wrap{max-width:46rem;margin:0 auto;padding:0 16px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;padding:18px 0 6px;font-size:.95rem;flex-wrap:wrap}
+header.top .brand{font-weight:700;letter-spacing:.01em;color:var(--fg);text-decoration:none}
+header.top nav{display:flex;gap:0 8px;flex-wrap:wrap}
+header.top a,.langs a{display:inline-block;min-height:24px;line-height:24px;padding:4px 6px}
+.langs{padding:0 0 4px;font-size:.9rem}
+.langs ul{list-style:none;margin:0;padding:0;display:flex;gap:0 8px;flex-wrap:wrap}
+.langs li{margin:0}
+.langs a[aria-current]{color:var(--fg);font-weight:700;text-decoration:none;border-bottom:2px solid var(--accent)}
+.hero{padding:32px 0 24px}
+.chip{display:inline-block;font-size:.82rem;padding:4px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);background:var(--card)}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.08;margin:18px 0 8px;letter-spacing:-.02em}
+.tag{font-size:clamp(1.25rem,4vw,1.6rem);line-height:1.3;margin:0 0 16px;font-weight:600}
+.lead{color:var(--muted);margin:0 0 24px;max-width:38rem}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 18px;border-radius:8px;text-decoration:none;font-weight:600;border:1px solid var(--control-border);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+section{padding:28px 0;border-top:1px solid var(--border)}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px;letter-spacing:-.01em}
+p{margin:0 0 14px}
+ol,ul{margin:0 0 14px;padding-inline-start:1.3rem}
+li{margin-bottom:8px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin:16px 0}
+@media (max-width:520px){.cards{grid-template-columns:1fr}}
+.card{border-radius:10px;padding:16px;border:1px solid var(--border);background:var(--card)}
+.card h3{margin:0 0 6px;font-size:1.05rem}
+.card p{margin:0;font-size:.95rem}
+.card{border-inline-start:4px solid var(--muted)}
+.card.ok{background:var(--ok-bg);border-inline-start-color:var(--ok)}
+.card.neutral{background:var(--neutral-bg);border-inline-start-color:var(--muted)}
+.card.warn{background:var(--warn-bg);border-inline-start-color:var(--warn)}
+.card.bad{background:var(--bad-bg);border-inline-start-color:var(--bad)}
+.note{font-size:.88rem;color:var(--muted)}
+code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.92em}
+footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted);font-size:.9rem}
+[dir=rtl] .hero,[dir=rtl] .lead{text-align:start}
+.cmp-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.cmp{border-collapse:collapse;width:100%;min-width:640px;font-size:.88rem}
+.cmp th,.cmp td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.cmp thead th{font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp th[scope=row]{text-align:start;font-weight:500}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .us{background:var(--ok-bg)}
+.cmp thead .us{color:var(--fg)}
+.cmp .y,.cmp .n,.cmp .p{display:block;font-weight:600;font-size:.82rem}
+.cmp .y{color:var(--ok)}.cmp .n{color:var(--bad)}.cmp .p{color:var(--warn)}
+.cmp small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+.big{font-size:1.15rem;font-weight:600;margin:0 0 10px}
+.crumb{font-size:.88rem;color:var(--muted);margin:18px 0 0}.crumb a{color:var(--muted)}
+.steps li{margin-bottom:10px}
+.cta{margin:18px 0 6px}
+.faq h3{font-size:1.05rem;margin:18px 0 6px}
+.src{font-size:.88rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">Vox Trust</a>
+    <nav aria-label="Main">
+      <a href="/demo/?lang=en">Demo</a>
+      <a href="https://github.com/vox-trust/vox-trust">GitHub</a>
+    </nav>
+  </header>
+  <nav class="langs" aria-label="Language"><ul><li><a href="/voice-cloning-scam/" hreflang="en" lang="en" aria-current="page">English</a></li><li><a href="/pt/golpe-voz-clonada/" hreflang="pt-BR" lang="pt-BR">Português</a></li></ul></nav>
+  <main id="main">
+    <p class="crumb"><a href="/">Vox Trust</a> › Voice-cloning scams</p>
+    <div class="hero" style="padding-top:8px">
+      <h1>Voice-cloning scams: how they work and how to protect yourself</h1>
+    </div>
+    <p class="lead">Scammers copy the voice of a child, parent or friend from a few seconds of audio taken from social media or messaging apps, then call or send voice messages asking for money in a hurry. Listening is no longer enough to tell a real voice from a cloned one. Here is how the scam works, what to do in the moment, and what technology can change.</p>
+    <section aria-labelledby="how">
+      <h2 id="how">How the scam works</h2>
+      <ol>
+        <li>The scammer collects a few seconds of the victim's voice: public videos, forwarded voice notes, a short call.</li>
+        <li>An AI tool generates new sentences with the same timbre and way of speaking.</li>
+        <li>Then comes the call or voice message: an accident, an arrest, a kidnapping, a lost phone. Always urgent, always secret.</li>
+        <li>The ask is an immediate transfer, gift cards or crypto, to an account you do not know.</li>
+      </ol>
+    </section>
+    <section aria-labelledby="signs">
+      <h2 id="signs">Warning signs</h2>
+      <ul>
+        <li>An emergency with extreme urgency, and pressure not to hang up.</li>
+        <li>A request for secrecy: "don't tell anyone".</li>
+        <li>Payment to an account in someone else's name, or by gift cards or crypto.</li>
+        <li>A new number, or "my phone broke".</li>
+      </ul>
+    </section>
+    <section aria-labelledby="do">
+      <h2 id="do">What to do in the moment</h2>
+      <ol class="steps">
+        <li><strong>Hang up and call back</strong> on the number you already have. This is the FTC's core advice.</li>
+        <li><strong>Agree on a family code word</strong> and ask for it before anything else. Pick something odd that is nowhere online.</li>
+        <li><strong>Ask a question</strong> only the real person could answer.</li>
+        <li><strong>Never pay under pressure.</strong> A real emergency survives two minutes of checking.</li>
+        <li><strong>If you paid,</strong> call your bank at once and report it to the police and the FTC (in the US: ReportFraud.ftc.gov).</li>
+      </ol>
+    </section>
+    <section aria-labelledby="detect">
+      <h2 id="detect">Why deepfake detectors are not enough</h2>
+      <p>Detectors estimate how likely a voice is to be synthetic. They do well on generators they have seen, but every new generation of AI means retraining, and the answer is always a probability. Instead of proving a voice is fake, you can flip the question: <strong>prove the real voice is real</strong>.</p>
+    </section>
+    <section aria-labelledby="vox">
+      <h2 id="vox">What Vox Trust changes</h2>
+      <p>Vox Trust is an open protocol that <strong>seals a voice at the source</strong>: the speaker's device signs the audio with a cryptographic key. The receiver checks, in the browser, whether the seal comes from a key they trust and which seconds were altered.</p>
+      <p><strong>Where it stands:</strong> it works for audio files sent without re-compression (for example as a document). Messaging-app voice notes and phone calls are re-compressed, and the watermark that would carry the seal through them is still research. It is a young project without an outside audit yet: use it alongside a code word, not instead of one.</p>
+      <p class="cta"><a class="btn primary" href="/demo/?lang=en">Try the demo in your browser</a> <a class="btn" href="/compare/">Compare with other solutions</a></p>
+    </section>
+    <section aria-labelledby="src">
+      <h2 id="src">Sources</h2>
+      <ul class="src">
+        <li><a href="https://consumer.ftc.gov/all-scams/family-emergency-scams">FTC: Family Emergency Scams</a></li>
+        <li><a href="https://www.cbsnews.com/news/ai-scam-voice-cloning-rising/">CBS News: cybercriminals are using AI voice cloning tools</a></li>
+        <li><a href="https://www.kaspersky.com.br/resource-center/threats/ai-voice-scam">Kaspersky: AI voice scams (Portuguese)</a></li>
+        <li><a href="https://github.com/vox-trust/vox-trust/blob/main/spec/THREAT-MODEL.md">Vox Trust threat model (the protocol's limits)</a></li>
+      </ul>
+    </section>
+
+    <section class="faq" aria-labelledby="faq">
+      <h2 id="faq">Frequently asked questions</h2>
+<h3>Can you recognise a cloned voice by ear?</h3>
+<p>Not reliably. Current tools copy timbre and intonation very well. The FTC puts it simply: do not trust the voice, confirm through another channel.</p>
+<h3>How much audio does a scammer need?</h3>
+<p>A few seconds of speech is enough for many tools, and public videos and voice notes on social media usually provide it.</p>
+<h3>Does a family code word really work?</h3>
+<p>Yes. It is simple and defeats the imitation, because the AI copies the voice, not what only your family knows. Choose an odd word that never appears online.</p>
+<h3>Does Vox Trust stop the scam?</h3>
+<p>Not on its own yet. It proves that an audio file came from a known key and was not altered, which works today for files sent without re-compression. For voice notes and calls, the part that survives re-compression is still experimental.</p>
+<h3>Is Vox Trust free?</h3>
+<p>Yes. It is open source (Apache-2.0), with a public specification and a demo that runs in the browser without sending anything to a server.</p>
+    </section>
+  </main>
+  <footer>
+    <p>Code under <a href="https://github.com/vox-trust/vox-trust/blob/main/LICENSE">Apache-2.0</a>. © 2026 <a href="https://www.linkedin.com/in/rogeroliveira/" rel="me">Roger Oliveira</a> and Vox Trust contributors. This site uses no cookies and loads nothing from third parties.</p>
+  </footer>
+</div>
+</body>
+</html>
