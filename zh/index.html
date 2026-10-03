@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vox Trust：为真实声音签章，而不是检测伪造</title>
-<meta name="description" content="开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.5.1，文件模式可用，尚未经过安全审计。">
+<meta name="description" content="开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.6.0，文件模式可用，尚未经过安全审计。">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)">
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vox Trust">
 <meta property="og:title" content="Vox Trust：为真实声音签章，而不是检测伪造">
-<meta property="og:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.5.1，尚未经过安全审计。">
+<meta property="og:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.6.0，尚未经过安全审计。">
 <meta property="og:url" content="https://vox-trust.github.io/zh/">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:locale:alternate" content="en_US">
@@ -35,7 +35,7 @@
 <meta property="og:image:alt" content="Vox Trust 标志和标语：不去检测伪造的声音，而是证明真实的声音。">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vox Trust：为真实声音签章，而不是检测伪造">
-<meta name="twitter:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.5.1，尚未经过安全审计。">
+<meta name="twitter:description" content="一个开放协议：在源头为人声签章，让任何人都能验证。v0.6.0，尚未经过安全审计。">
 <meta name="twitter:image" content="https://vox-trust.github.io/og.png">
 <meta name="twitter:image:alt" content="Vox Trust 标志和标语：不去检测伪造的声音，而是证明真实的声音。">
 <script type="application/ld+json">
@@ -58,7 +58,7 @@
    "@id": "https://vox-trust.github.io/zh/#page",
    "url": "https://vox-trust.github.io/zh/",
    "name": "Vox Trust：为真实声音签章，而不是检测伪造",
-   "description": "开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.5.1，文件模式可用，尚未经过安全审计。",
+   "description": "开放协议与 Rust 参考实现：在源头为人声签章，让任何人都能验证。v0.6.0，文件模式可用，尚未经过安全审计。",
    "inLanguage": "zh-Hans",
    "isPartOf": {
     "@id": "https://vox-trust.github.io/#site"
@@ -81,7 +81,7 @@
    "codeRepository": "https://github.com/vox-trust/vox-trust",
    "programmingLanguage": "Rust",
    "license": "https://www.apache.org/licenses/LICENSE-2.0",
-   "version": "0.5.1",
+   "version": "0.6.0",
    "author": {
     "@type": "Person",
     "name": "Roger Oliveira",
@@ -186,7 +186,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 
   <main id="main">
     <div class="hero">
-      <span class="chip">v0.5.1 · 文件模式可用 · 未经审计</span>
+      <span class="chip">v0.6.0 · 文件模式可用 · 未经审计</span>
       <h1>Vox Trust</h1>
       <p class="tag">不去检测伪造的声音，而是证明真实的声音。</p>
       <p class="lead">一个开放协议及其 Rust 参考实现：在源头为人声签章，让任何人日后都能验证。</p>
@@ -259,6 +259,7 @@ const sealed = vt.seal(wav, {
 const report = vt.verify(sealed, { pinnedPublicKey });
 vt.decide(report.check, contact); // &quot;verified&quot; | &quot;unsealed&quot; | &quot;warning&quot; | &quot;alert&quot;</code></pre>
       <p><a href="https://github.com/vox-trust/vox-trust/blob/main/docs/INTEGRATION.md">集成指南</a>（英文）约需 10 分钟，并附 Node、浏览器和 Rust <a href="https://github.com/vox-trust/vox-trust/tree/main/examples">示例</a>。Apache-2.0，无需调用任何服务，无需账号。</p>
+      <p>另有：<code>pip install vox-trust</code>（Python）、随每个 <a href="https://github.com/vox-trust/vox-trust/releases">release</a> 附带的 Android 与 iOS 库、适用于 Chrome、Firefox 和 Safari 的<a href="https://github.com/vox-trust/vox-trust/tree/main/extension">浏览器扩展</a>，以及供 AI 助手验证录音的 <a href="https://github.com/vox-trust/vox-trust/tree/main/mcp">MCP 服务器</a>。</p>
     </section>
 
     <section aria-labelledby="not">

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vox Trust: prove real voices, don't detect fakes</title>
-<meta name="description" content="Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.5.1, file mode works, not audited.">
+<meta name="description" content="Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.6.0, file mode works, not audited.">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)">
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vox Trust">
 <meta property="og:title" content="Vox Trust: prove real voices, don't detect fakes">
-<meta property="og:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.5.1, not audited.">
+<meta property="og:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.6.0, not audited.">
 <meta property="og:url" content="https://vox-trust.github.io/">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="pt_BR">
@@ -35,7 +35,7 @@
 <meta property="og:image:alt" content="Vox Trust logo and the line: Don't detect fake voices. Prove real ones.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vox Trust: prove real voices, don't detect fakes">
-<meta name="twitter:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.5.1, not audited.">
+<meta name="twitter:description" content="An open protocol that seals a human voice at the source so anyone can verify it. v0.6.0, not audited.">
 <meta name="twitter:image" content="https://vox-trust.github.io/og.png">
 <meta name="twitter:image:alt" content="Vox Trust logo and the line: Don't detect fake voices. Prove real ones.">
 <script type="application/ld+json">
@@ -58,7 +58,7 @@
    "@id": "https://vox-trust.github.io/#page",
    "url": "https://vox-trust.github.io/",
    "name": "Vox Trust: prove real voices, don't detect fakes",
-   "description": "Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.5.1, file mode works, not audited.",
+   "description": "Open protocol with a Rust reference implementation that seals a human voice at the source so anyone can verify it. v0.6.0, file mode works, not audited.",
    "inLanguage": "en",
    "isPartOf": {
     "@id": "https://vox-trust.github.io/#site"
@@ -81,7 +81,7 @@
    "codeRepository": "https://github.com/vox-trust/vox-trust",
    "programmingLanguage": "Rust",
    "license": "https://www.apache.org/licenses/LICENSE-2.0",
-   "version": "0.5.1",
+   "version": "0.6.0",
    "author": {
     "@type": "Person",
     "name": "Roger Oliveira",
@@ -188,7 +188,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 
   <main id="main">
     <div class="hero">
-      <span class="chip">v0.5.1 · file mode works · not audited</span>
+      <span class="chip">v0.6.0 · file mode works · not audited</span>
       <h1>Vox Trust</h1>
       <p class="tag">Don't detect fake voices. Prove real ones.</p>
       <p class="lead">An open protocol and Rust reference implementation that seals a human voice at the source, so anyone can verify it later.</p>
@@ -261,6 +261,7 @@ const sealed = vt.seal(wav, {
 const report = vt.verify(sealed, { pinnedPublicKey });
 vt.decide(report.check, contact); // &quot;verified&quot; | &quot;unsealed&quot; | &quot;warning&quot; | &quot;alert&quot;</code></pre>
       <p>The <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/INTEGRATION.md">integration guide</a> takes about 10 minutes, with <a href="https://github.com/vox-trust/vox-trust/tree/main/examples">examples</a> for Node, the browser and Rust. Apache-2.0, no service to call, no account.</p>
+      <p>Also: <code>pip install vox-trust</code> (Python), Android and iOS libraries attached to each <a href="https://github.com/vox-trust/vox-trust/releases">release</a>, a <a href="https://github.com/vox-trust/vox-trust/tree/main/extension">browser extension</a> for Chrome, Firefox and Safari, and an <a href="https://github.com/vox-trust/vox-trust/tree/main/mcp">MCP server</a> so AI assistants can verify recordings.</p>
     </section>
 
     <section aria-labelledby="not">

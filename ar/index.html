@@ -81,7 +81,7 @@
    "codeRepository": "https://github.com/vox-trust/vox-trust",
    "programmingLanguage": "Rust",
    "license": "https://www.apache.org/licenses/LICENSE-2.0",
-   "version": "0.5.1",
+   "version": "0.6.0",
    "author": {
     "@type": "Person",
     "name": "Roger Oliveira",
@@ -186,7 +186,7 @@ footer{padding:28px 0 48px;border-top:1px solid var(--border);color:var(--muted)
 
   <main id="main">
     <div class="hero">
-      <span class="chip">v0.5.1 · وضع الملفات يعمل · دون تدقيق أمني</span>
+      <span class="chip">v0.6.0 · وضع الملفات يعمل · دون تدقيق أمني</span>
       <h1>Vox Trust</h1>
       <p class="tag">لا تكشف الأصوات المزيّفة. أثبت الحقيقية.</p>
       <p class="lead">بروتوكول مفتوح وتنفيذ مرجعي بلغة Rust يختمان الصوت البشري عند المصدر، ليتمكن أي شخص من التحقق منه لاحقًا.</p>
@@ -259,6 +259,7 @@ const sealed = vt.seal(wav, {
 const report = vt.verify(sealed, { pinnedPublicKey });
 vt.decide(report.check, contact); // &quot;verified&quot; | &quot;unsealed&quot; | &quot;warning&quot; | &quot;alert&quot;</code></pre>
       <p>يستغرق <a href="https://github.com/vox-trust/vox-trust/blob/main/docs/INTEGRATION.md">دليل الدمج</a> (بالإنجليزية) نحو 10 دقائق، مع <a href="https://github.com/vox-trust/vox-trust/tree/main/examples">أمثلة</a> لـ Node والمتصفح وRust. الترخيص Apache-2.0، بلا خدمة خارجية وبلا حساب.</p>
+      <p>وأيضًا: <code>pip install vox-trust</code> (Python)، ومكتبات Android وiOS مرفقة بكل <a href="https://github.com/vox-trust/vox-trust/releases">إصدار</a>، و<a href="https://github.com/vox-trust/vox-trust/tree/main/extension">إضافة متصفح</a> لـ Chrome وFirefox وSafari، و<a href="https://github.com/vox-trust/vox-trust/tree/main/mcp">خادم MCP</a> ليتحقق مساعدو الذكاء الاصطناعي من التسجيلات.</p>
     </section>
 
     <section aria-labelledby="not">
